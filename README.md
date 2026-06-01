@@ -1,101 +1,137 @@
-# OwlReading
+# Owl Reading
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+Phase 1 Nx workspace for a web-only novel reading platform. This repository currently establishes the project structure, application shells, shared libraries, Prisma schema, PostgreSQL Docker setup, and CI-friendly scripts. Business features are intentionally not implemented yet.
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+## Requirements
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/getting-started/tutorials/angular-monorepo-tutorial?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+- Node.js 22 LTS
+- pnpm 11+
+- Docker Desktop, or another Docker Compose compatible runtime
 
-## Run tasks
-
-To run the dev server for your app, use:
-
-```sh
-npx nx serve owl-reading
-```
-
-To create a production bundle:
+Verified locally with:
 
 ```sh
-npx nx build owl-reading
+node --version
+pnpm --version
 ```
 
-To see all available targets to run for a project, run:
+## Projects
+
+- `owl-reading`: Angular web reader app (`apps/owl-reading`)
+- `admin-dashboard`: Angular admin app (`admin-dashboard`)
+- `api`: NestJS API (`api`)
+- `shared-types`: shared TypeScript API/domain models (`shared-types`)
+- `shared-ui`: shared Angular UI library (`shared-ui`)
+- `shared-utils`: shared TypeScript utilities (`libs/shared-utils`)
+
+The first release is web only. The backend and shared models are intended to support a future mobile app without adding mobile code in Phase 1.
+
+## Setup
+
+Install dependencies:
 
 ```sh
-npx nx show project owl-reading
+pnpm install
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+Create or update `.env` with the local PostgreSQL connection string:
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+```env
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/owl_reading?schema=public"
+```
 
-## Add new projects
-
-While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
-
-Use the plugin's generator to create new projects.
-
-To generate a new application, use:
+Start PostgreSQL:
 
 ```sh
-npx nx g @nx/angular:app demo
+pnpm db:up
 ```
 
-To generate a new library, use:
+Generate the Prisma client:
 
 ```sh
-npx nx g @nx/angular:lib mylib
+pnpm db:generate
 ```
 
-You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
-
-[Learn more about Nx plugins &raquo;](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) | [Browse the plugin registry &raquo;](https://nx.dev/plugin-registry?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Set up CI!
-
-### Step 1
-
-To connect to Nx Cloud, run the following command:
+Apply database migrations during local development:
 
 ```sh
-npx nx connect
+pnpm db:migrate
 ```
 
-Connecting to Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
-
-- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-### Step 2
-
-Use the following command to configure a CI workflow for your workspace:
+Validate the Prisma schema without changing the database:
 
 ```sh
-npx nx g ci-workflow
+pnpm db:validate
 ```
 
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## Development
 
-## Install Nx Console
+Run the web reader:
 
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
+```sh
+pnpm dev:web
+```
 
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+Run the admin dashboard:
 
-## Useful links
+```sh
+pnpm dev:admin
+```
 
-Learn more:
+Run the API:
 
-- [Learn more about this workspace setup](https://nx.dev/getting-started/tutorials/angular-monorepo-tutorial?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+```sh
+pnpm dev:api
+```
 
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+Default local URLs:
+
+- Web reader: `http://localhost:4200`
+- Admin dashboard: `http://localhost:4201`
+- API: `http://localhost:3000/api`
+- PostgreSQL: `localhost:5432`
+
+## Quality Checks
+
+Run all CI-friendly checks:
+
+```sh
+pnpm verify
+```
+
+Run checks individually:
+
+```sh
+pnpm lint
+pnpm test
+pnpm build
+pnpm format:check
+```
+
+Format the workspace:
+
+```sh
+pnpm format
+```
+
+## Database
+
+Local PostgreSQL is defined in `docker-compose.yml` using PostgreSQL 16.
+
+Useful commands:
+
+```sh
+pnpm db:up
+pnpm db:down
+pnpm db:studio
+```
+
+The initial schema includes:
+
+- `User`
+- `Novel`
+- `Chapter`
+- `Bookmark`
+- `ReadingProgress`
+
+For MVP content management, admins will manually create novels and chapters. EPUB import, scraping, and external content APIs are not part of Phase 1.
