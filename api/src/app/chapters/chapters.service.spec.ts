@@ -1,3 +1,4 @@
+import { ConflictException } from '@nestjs/common';
 import { NovelStatus } from '@prisma/client';
 import { PrismaService } from '../database/prisma.service';
 import { ChaptersService } from './chapters.service';
@@ -6,8 +7,10 @@ describe('ChaptersService', () => {
   let prisma: {
     chapter: {
       count: jest.Mock;
+      delete: jest.Mock;
       findFirst: jest.Mock;
       findMany: jest.Mock;
+      findUnique: jest.Mock;
     };
   };
   let service: ChaptersService;
@@ -16,8 +19,10 @@ describe('ChaptersService', () => {
     prisma = {
       chapter: {
         count: jest.fn(),
+        delete: jest.fn(),
         findFirst: jest.fn(),
         findMany: jest.fn(),
+        findUnique: jest.fn(),
       },
     };
     service = new ChaptersService(prisma as unknown as PrismaService);
@@ -93,5 +98,63 @@ describe('ChaptersService', () => {
       orderBy: { chapterNumber: 'asc' },
       select: { chapterNumber: true },
     });
+  });
+
+  it('blocks deleting chapters from published novels', async () => {
+    prisma.chapter.findUnique.mockResolvedValue({
+      novel: {
+        status: NovelStatus.PUBLISHED,
+      },
+    });
+
+    await expect(service.delete('chapter-id')).rejects.toBeInstanceOf(
+      ConflictException,
+    );
+    expect(prisma.chapter.delete).not.toHaveBeenCalled();
+  });
+
+  it('allows deleting chapters from draft novels', async () => {
+    const deletedChapter = {
+      id: 'chapter-id',
+      novelId: 'novel-id',
+      chapterNumber: 1,
+      title: 'A Draft Chapter',
+      content: '...',
+      createdAt: new Date('2026-01-01T00:00:00.000Z'),
+      updatedAt: new Date('2026-01-02T00:00:00.000Z'),
+    };
+
+    prisma.chapter.findUnique.mockResolvedValue({
+      novel: {
+        status: NovelStatus.DRAFT,
+      },
+    });
+    prisma.chapter.delete.mockResolvedValue(deletedChapter);
+
+    await expect(service.delete('chapter-id')).resolves.toEqual(deletedChapter);
+    expect(prisma.chapter.delete).toHaveBeenCalledWith({
+      where: { id: 'chapter-id' },
+    });
+  });
+
+  it('allows deleting chapters from archived novels', async () => {
+    const deletedChapter = {
+      id: 'chapter-id',
+      novelId: 'novel-id',
+      chapterNumber: 1,
+      title: 'An Archived Chapter',
+      content: '...',
+      createdAt: new Date('2026-01-01T00:00:00.000Z'),
+      updatedAt: new Date('2026-01-02T00:00:00.000Z'),
+    };
+
+    prisma.chapter.findUnique.mockResolvedValue({
+      novel: {
+        status: NovelStatus.ARCHIVED,
+      },
+    });
+    prisma.chapter.delete.mockResolvedValue(deletedChapter);
+
+    await expect(service.delete('chapter-id')).resolves.toEqual(deletedChapter);
   });
 });

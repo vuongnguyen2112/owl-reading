@@ -161,6 +161,27 @@ export class ChaptersService {
 
   async delete(id: string) {
     try {
+      const existingChapter = await this.prisma.chapter.findUnique({
+        where: { id },
+        select: {
+          novel: {
+            select: {
+              status: true,
+            },
+          },
+        },
+      });
+
+      if (!existingChapter) {
+        throw new NotFoundException('Chapter was not found.');
+      }
+
+      if (existingChapter.novel.status === NovelStatus.PUBLISHED) {
+        throw new ConflictException(
+          'Chapters from published novels cannot be deleted.',
+        );
+      }
+
       const chapter = await this.prisma.chapter.delete({ where: { id } });
 
       return toChapterResponseDto(chapter);

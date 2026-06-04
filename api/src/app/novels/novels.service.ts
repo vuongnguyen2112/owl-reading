@@ -124,6 +124,21 @@ export class NovelsService {
 
   async delete(id: string) {
     try {
+      const existingNovel = await this.prisma.novel.findUnique({
+        where: { id },
+        select: { status: true },
+      });
+
+      if (!existingNovel) {
+        throw new NotFoundException('Novel was not found.');
+      }
+
+      if (existingNovel.status === NovelStatus.PUBLISHED) {
+        throw new ConflictException(
+          'Published novels must be archived or unpublished before deletion.',
+        );
+      }
+
       const novel = await this.prisma.novel.delete({ where: { id } });
 
       return toNovelResponseDto(novel);

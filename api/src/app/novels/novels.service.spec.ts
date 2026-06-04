@@ -1,3 +1,4 @@
+import { ConflictException } from '@nestjs/common';
 import { NovelStatus } from '@prisma/client';
 import { PrismaService } from '../database/prisma.service';
 import { NovelsService } from './novels.service';
@@ -7,6 +8,8 @@ describe('NovelsService', () => {
     novel: {
       count: jest.Mock;
       create: jest.Mock;
+      delete: jest.Mock;
+      findUnique: jest.Mock;
       findMany: jest.Mock;
     };
   };
@@ -17,6 +20,8 @@ describe('NovelsService', () => {
       novel: {
         count: jest.fn(),
         create: jest.fn(),
+        delete: jest.fn(),
+        findUnique: jest.fn(),
         findMany: jest.fn(),
       },
     };
@@ -82,5 +87,59 @@ describe('NovelsService', () => {
         },
       },
     });
+  });
+
+  it('blocks deleting published novels', async () => {
+    prisma.novel.findUnique.mockResolvedValue({
+      status: NovelStatus.PUBLISHED,
+    });
+
+    await expect(service.delete('novel-id')).rejects.toBeInstanceOf(
+      ConflictException,
+    );
+    expect(prisma.novel.delete).not.toHaveBeenCalled();
+  });
+
+  it('allows deleting draft novels', async () => {
+    const deletedNovel = {
+      id: 'novel-id',
+      title: 'The Clockwork Owl',
+      slug: 'the-clockwork-owl',
+      description: null,
+      coverImageUrl: null,
+      status: NovelStatus.DRAFT,
+      createdAt: new Date('2026-01-01T00:00:00.000Z'),
+      updatedAt: new Date('2026-01-02T00:00:00.000Z'),
+    };
+
+    prisma.novel.findUnique.mockResolvedValue({
+      status: NovelStatus.DRAFT,
+    });
+    prisma.novel.delete.mockResolvedValue(deletedNovel);
+
+    await expect(service.delete('novel-id')).resolves.toEqual(deletedNovel);
+    expect(prisma.novel.delete).toHaveBeenCalledWith({
+      where: { id: 'novel-id' },
+    });
+  });
+
+  it('allows deleting archived novels', async () => {
+    const deletedNovel = {
+      id: 'novel-id',
+      title: 'The Clockwork Owl',
+      slug: 'the-clockwork-owl',
+      description: null,
+      coverImageUrl: null,
+      status: NovelStatus.ARCHIVED,
+      createdAt: new Date('2026-01-01T00:00:00.000Z'),
+      updatedAt: new Date('2026-01-02T00:00:00.000Z'),
+    };
+
+    prisma.novel.findUnique.mockResolvedValue({
+      status: NovelStatus.ARCHIVED,
+    });
+    prisma.novel.delete.mockResolvedValue(deletedNovel);
+
+    await expect(service.delete('novel-id')).resolves.toEqual(deletedNovel);
   });
 });
