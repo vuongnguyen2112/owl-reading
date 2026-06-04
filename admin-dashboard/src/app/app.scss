@@ -3,6 +3,24 @@
   min-height: 100vh;
 }
 
+.topbar {
+  border-bottom: 1px solid #d9dee8;
+}
+
+.brand {
+  color: inherit;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.topbar-spacer {
+  flex: 1 1 auto;
+}
+
+.active-link {
+  background: rgb(0 0 0 / 8%);
+}
+
 .app-shell {
   width: min(100% - 32px, 1120px);
   margin: 0 auto;

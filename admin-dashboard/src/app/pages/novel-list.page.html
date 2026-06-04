@@ -1,0 +1,114 @@
+<header class="page-header">
+  <div>
+    <p class="eyebrow">Novels</p>
+    <h1>Manage novels</h1>
+  </div>
+  <a mat-flat-button color="primary" routerLink="/novels/new">New novel</a>
+</header>
+
+@if (!hasAuthToken()) {
+<mat-card class="notice-card">
+  <mat-card-content>
+    Add an admin access token to session storage key
+    <code>owl_access_token</code> before using the dashboard.
+  </mat-card-content>
+</mat-card>
+}
+
+<form class="toolbar-row" (ngSubmit)="applySearch()">
+  <mat-form-field appearance="outline">
+    <mat-label>Search by title</mat-label>
+    <input
+      matInput
+      name="search"
+      [ngModel]="search()"
+      (ngModelChange)="search.set($event)"
+    />
+  </mat-form-field>
+  <button mat-flat-button color="primary" type="submit">Search</button>
+  @if (search()) {
+  <button mat-button type="button" (click)="clearSearch()">Clear</button>
+  }
+</form>
+
+@if (state().error) {
+<mat-card class="error-card">
+  <mat-card-content>{{ state().error }}</mat-card-content>
+</mat-card>
+} @if (state().loading && !novels().length) {
+<section class="state-panel">
+  <mat-spinner diameter="36"></mat-spinner>
+</section>
+} @else if (!novels().length) {
+<section class="state-panel">
+  <h2>No novels found</h2>
+  <p>Create the first novel or adjust your search.</p>
+</section>
+} @else {
+<table mat-table [dataSource]="novels()" class="novel-table">
+  <ng-container matColumnDef="title">
+    <th mat-header-cell *matHeaderCellDef>Title</th>
+    <td mat-cell *matCellDef="let novel">{{ novel.title }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="slug">
+    <th mat-header-cell *matHeaderCellDef>Slug</th>
+    <td mat-cell *matCellDef="let novel">{{ novel.slug }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="status">
+    <th mat-header-cell *matHeaderCellDef>Status</th>
+    <td mat-cell *matCellDef="let novel">{{ novel.status }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="updatedAt">
+    <th mat-header-cell *matHeaderCellDef>Updated</th>
+    <td mat-cell *matCellDef="let novel">
+      {{ novel.updatedAt | date: 'mediumDate' }}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="actions">
+    <th mat-header-cell *matHeaderCellDef></th>
+    <td mat-cell *matCellDef="let novel" class="actions-cell">
+      <a mat-button [routerLink]="['/novels', novel.id, 'edit']">Edit</a>
+      <a mat-button [routerLink]="['/novels', novel.id, 'chapters']"
+        >Chapters</a
+      >
+      @if (novel.status !== 'PUBLISHED') {
+      <button
+        mat-button
+        type="button"
+        color="warn"
+        (click)="deleteNovel(novel)"
+      >
+        Delete
+      </button>
+      }
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+</table>
+
+<nav class="pagination" aria-label="Novel pages">
+  <button
+    mat-stroked-button
+    type="button"
+    [disabled]="!hasPreviousPage()"
+    (click)="goToPreviousPage()"
+  >
+    Previous
+  </button>
+  <span>{{ total() }} novels - Page {{ page() }}</span>
+  <button
+    mat-stroked-button
+    type="button"
+    [disabled]="!hasNextPage()"
+    (click)="goToNextPage()"
+  >
+    Next
+  </button>
+</nav>
+}

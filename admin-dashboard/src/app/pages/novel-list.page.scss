@@ -1,0 +1,71 @@
+.page-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.page-header h1,
+.page-header p {
+  margin: 0;
+}
+
+.eyebrow {
+  color: #42526e;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.toolbar-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.toolbar-row mat-form-field {
+  width: min(100%, 360px);
+}
+
+.notice-card,
+.error-card {
+  margin-bottom: 16px;
+  border-radius: 8px;
+  box-shadow: none;
+}
+
+.notice-card {
+  border: 1px solid #b7c7e6;
+}
+
+.error-card {
+  border: 1px solid #e6b7b7;
+  color: #9b1c1c;
+}
+
+.novel-table {
+  width: 100%;
+}
+
+.actions-cell {
+  white-space: nowrap;
+  text-align: right;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.state-panel {
+  display: grid;
+  min-height: 260px;
+  place-items: center;
+  gap: 8px;
+  text-align: center;
+}

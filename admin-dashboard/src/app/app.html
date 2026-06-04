@@ -1,4 +1,9 @@
+<mat-toolbar class="topbar">
+  <a class="brand" routerLink="/">{{ title }}</a>
+  <span class="topbar-spacer"></span>
+  <a mat-button routerLink="/novels" routerLinkActive="active-link">Novels</a>
+</mat-toolbar>
+
 <main class="app-shell">
-  <h1>{{ title }}</h1>
   <router-outlet></router-outlet>
 </main>

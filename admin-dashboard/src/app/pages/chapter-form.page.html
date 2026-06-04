@@ -1,0 +1,81 @@
+<header class="page-header">
+  <div>
+    <p class="eyebrow">Chapters</p>
+    <h1>{{ isEditing() ? 'Edit chapter' : 'Create chapter' }}</h1>
+    @if (state().data?.novel) {
+    <p class="status-copy">
+      {{ state().data?.novel?.title }} - {{ state().data?.novel?.status }}
+    </p>
+    }
+  </div>
+  <a mat-button [routerLink]="['/novels', novelId(), 'chapters']"
+    >Back to chapters</a
+  >
+</header>
+
+@if (state().loading) {
+<section class="state-panel">
+  <mat-spinner diameter="36"></mat-spinner>
+</section>
+} @else {
+<mat-card class="form-card">
+  <mat-card-content>
+    @if (state().error) {
+    <p class="error-copy">{{ state().error }}</p>
+    }
+
+    <form class="chapter-form" (ngSubmit)="saveChapter()">
+      <mat-form-field appearance="outline">
+        <mat-label>Title</mat-label>
+        <input
+          matInput
+          maxlength="200"
+          name="title"
+          required
+          [ngModel]="title()"
+          (ngModelChange)="title.set($event)"
+        />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Order</mat-label>
+        <input
+          matInput
+          min="1"
+          name="chapterNumber"
+          required
+          type="number"
+          [ngModel]="chapterNumber()"
+          (ngModelChange)="chapterNumber.set($event)"
+        />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Content</mat-label>
+        <textarea
+          matInput
+          name="content"
+          required
+          rows="18"
+          [ngModel]="content()"
+          (ngModelChange)="content.set($event)"
+        ></textarea>
+      </mat-form-field>
+
+      <div class="form-actions">
+        <button
+          mat-flat-button
+          color="primary"
+          type="submit"
+          [disabled]="saving()"
+        >
+          {{ saving() ? 'Saving...' : 'Save chapter' }}
+        </button>
+        <a mat-button [routerLink]="['/novels', novelId(), 'chapters']"
+          >Cancel</a
+        >
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>
+}
