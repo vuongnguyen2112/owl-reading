@@ -11,14 +11,17 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiCreatedResponse,
-  ApiHeader,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+import { UserRole } from '@prisma/client';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
 import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
-import { PlaceholderAdminGuard } from '../common/placeholder-admin.guard';
 import { ChaptersService } from './chapters.service';
 import { ChapterResponseDto } from './dto/chapter-response.dto';
 import { CreateChapterDto } from './dto/create-chapter.dto';
@@ -55,11 +58,9 @@ export class PublicChaptersController {
 }
 
 @ApiTags('admin chapters')
-@ApiHeader({
-  name: 'x-admin-key',
-  description: 'Temporary admin API key until authentication is implemented.',
-})
-@UseGuards(PlaceholderAdminGuard)
+@ApiBearerAuth()
+@Roles(UserRole.ADMIN)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('admin/chapters')
 export class AdminChaptersController {
   constructor(private readonly chaptersService: ChaptersService) {}

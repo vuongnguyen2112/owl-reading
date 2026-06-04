@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { PlaceholderAdminGuard } from '../common/placeholder-admin.guard';
+import { AuthModule } from '../auth/auth.module';
 import {
   AdminChaptersController,
   PublicChaptersController,
@@ -7,7 +7,8 @@ import {
 import { ChaptersService } from './chapters.service';
 
 @Module({
+  imports: [AuthModule],
   controllers: [PublicChaptersController, AdminChaptersController],
-  providers: [ChaptersService, PlaceholderAdminGuard],
+  providers: [ChaptersService],
 })
 export class ChaptersModule {}

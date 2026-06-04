@@ -10,13 +10,16 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiCreatedResponse,
-  ApiHeader,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { PlaceholderAdminGuard } from '../common/placeholder-admin.guard';
+import { UserRole } from '@prisma/client';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
 import { CreateNovelDto } from './dto/create-novel.dto';
 import { ListNovelsQueryDto } from './dto/list-novels-query.dto';
 import { NovelResponseDto } from './dto/novel-response.dto';
@@ -44,11 +47,9 @@ export class PublicNovelsController {
 }
 
 @ApiTags('admin novels')
-@ApiHeader({
-  name: 'x-admin-key',
-  description: 'Temporary admin API key until authentication is implemented.',
-})
-@UseGuards(PlaceholderAdminGuard)
+@ApiBearerAuth()
+@Roles(UserRole.ADMIN)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('admin/novels')
 export class AdminNovelsController {
   constructor(private readonly novelsService: NovelsService) {}

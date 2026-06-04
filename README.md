@@ -126,6 +126,27 @@ pnpm db:down
 pnpm db:studio
 ```
 
+## Local Admin User
+
+Admin API routes require a logged-in user with the `ADMIN` role. There are no
+default admin credentials.
+
+For local development, first create a user through `POST /api/auth/register` or
+run the local seed, then promote that existing user by email:
+
+```sh
+ADMIN_EMAIL="reader@example.com" pnpm admin:promote
+```
+
+On Windows PowerShell:
+
+```powershell
+$env:ADMIN_EMAIL="reader@example.com"; pnpm admin:promote
+```
+
+The promotion script refuses to run in production unless
+`ALLOW_ADMIN_PROMOTION=true` is explicitly set.
+
 The initial schema includes:
 
 - `User`

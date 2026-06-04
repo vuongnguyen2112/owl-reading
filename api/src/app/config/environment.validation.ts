@@ -17,8 +17,6 @@ export const environmentValidationSchema = Joi.object({
         .filter(Boolean)
         .join(','),
     ),
-  ADMIN_API_KEY: Joi.string().min(12).optional(),
-  ALLOW_PLACEHOLDER_ADMIN: Joi.boolean().default(false),
   JWT_ACCESS_SECRET: Joi.when('NODE_ENV', {
     is: 'production',
     then: Joi.string().min(32).required(),
