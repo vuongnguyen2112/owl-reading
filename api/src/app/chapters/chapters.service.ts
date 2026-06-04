@@ -39,7 +39,7 @@ export class ChaptersService {
     }
 
     return toPaginatedResponse(
-      items.map(toChapterResponseDto),
+      items.map((chapter) => toChapterResponseDto(chapter)),
       total,
       query.page,
       query.pageSize,
@@ -64,7 +64,29 @@ export class ChaptersService {
       throw new NotFoundException('Published chapter was not found.');
     }
 
-    return toChapterResponseDto(chapter);
+    const [previousChapter, nextChapter] = await Promise.all([
+      this.prisma.chapter.findFirst({
+        where: {
+          novelId: chapter.novelId,
+          chapterNumber: { lt: chapter.chapterNumber },
+        },
+        orderBy: { chapterNumber: 'desc' },
+        select: { chapterNumber: true },
+      }),
+      this.prisma.chapter.findFirst({
+        where: {
+          novelId: chapter.novelId,
+          chapterNumber: { gt: chapter.chapterNumber },
+        },
+        orderBy: { chapterNumber: 'asc' },
+        select: { chapterNumber: true },
+      }),
+    ]);
+
+    return toChapterResponseDto(chapter, {
+      previousChapterNumber: previousChapter?.chapterNumber ?? null,
+      nextChapterNumber: nextChapter?.chapterNumber ?? null,
+    });
   }
 
   async listAdmin(query: ListChaptersQueryDto) {
@@ -83,7 +105,7 @@ export class ChaptersService {
     ]);
 
     return toPaginatedResponse(
-      items.map(toChapterResponseDto),
+      items.map((chapter) => toChapterResponseDto(chapter)),
       total,
       query.page,
       query.pageSize,

@@ -55,13 +55,20 @@ describe('ChaptersService', () => {
       createdAt: new Date('2026-01-01T00:00:00.000Z'),
       updatedAt: new Date('2026-01-02T00:00:00.000Z'),
     };
-    prisma.chapter.findFirst.mockResolvedValue(chapter);
+    prisma.chapter.findFirst
+      .mockResolvedValueOnce(chapter)
+      .mockResolvedValueOnce({ chapterNumber: 2 })
+      .mockResolvedValueOnce({ chapterNumber: 4 });
 
     await expect(
       service.findPublishedByNovelSlugAndNumber('the-clockwork-owl', 3),
-    ).resolves.toEqual(chapter);
+    ).resolves.toEqual({
+      ...chapter,
+      previousChapterNumber: 2,
+      nextChapterNumber: 4,
+    });
 
-    expect(prisma.chapter.findFirst).toHaveBeenCalledWith({
+    expect(prisma.chapter.findFirst).toHaveBeenNthCalledWith(1, {
       where: {
         chapterNumber: 3,
         novel: {
@@ -69,6 +76,22 @@ describe('ChaptersService', () => {
           status: NovelStatus.PUBLISHED,
         },
       },
+    });
+    expect(prisma.chapter.findFirst).toHaveBeenNthCalledWith(2, {
+      where: {
+        novelId: 'novel-id',
+        chapterNumber: { lt: 3 },
+      },
+      orderBy: { chapterNumber: 'desc' },
+      select: { chapterNumber: true },
+    });
+    expect(prisma.chapter.findFirst).toHaveBeenNthCalledWith(3, {
+      where: {
+        novelId: 'novel-id',
+        chapterNumber: { gt: 3 },
+      },
+      orderBy: { chapterNumber: 'asc' },
+      select: { chapterNumber: true },
     });
   });
 });

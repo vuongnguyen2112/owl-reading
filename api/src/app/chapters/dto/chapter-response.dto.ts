@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Chapter } from '@prisma/client';
 
 export class ChapterResponseDto {
@@ -22,9 +22,23 @@ export class ChapterResponseDto {
 
   @ApiProperty()
   updatedAt!: Date;
+
+  @ApiPropertyOptional({ nullable: true })
+  previousChapterNumber?: number | null;
+
+  @ApiPropertyOptional({ nullable: true })
+  nextChapterNumber?: number | null;
 }
 
-export function toChapterResponseDto(chapter: Chapter): ChapterResponseDto {
+interface ChapterNavigationOptions {
+  previousChapterNumber?: number | null;
+  nextChapterNumber?: number | null;
+}
+
+export function toChapterResponseDto(
+  chapter: Chapter,
+  navigation: ChapterNavigationOptions = {},
+): ChapterResponseDto {
   return {
     id: chapter.id,
     novelId: chapter.novelId,
@@ -33,5 +47,6 @@ export function toChapterResponseDto(chapter: Chapter): ChapterResponseDto {
     content: chapter.content,
     createdAt: chapter.createdAt,
     updatedAt: chapter.updatedAt,
+    ...navigation,
   };
 }
