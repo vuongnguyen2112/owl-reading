@@ -28,7 +28,11 @@ describe('NovelsService', () => {
       id: 'novel-id',
       title: 'The Clockwork Owl',
       slug: 'the-clockwork-owl',
+      description: null,
+      coverImageUrl: null,
       status: NovelStatus.DRAFT,
+      createdAt: new Date('2026-01-01T00:00:00.000Z'),
+      updatedAt: new Date('2026-01-02T00:00:00.000Z'),
     };
     prisma.novel.create.mockResolvedValue(createdNovel);
 

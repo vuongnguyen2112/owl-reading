@@ -82,7 +82,12 @@ export class ChaptersService {
       this.prisma.chapter.count({ where }),
     ]);
 
-    return toPaginatedResponse(items, total, query.page, query.pageSize);
+    return toPaginatedResponse(
+      items.map(toChapterResponseDto),
+      total,
+      query.page,
+      query.pageSize,
+    );
   }
 
   async findAdminById(id: string) {
@@ -92,12 +97,12 @@ export class ChaptersService {
       throw new NotFoundException('Chapter was not found.');
     }
 
-    return chapter;
+    return toChapterResponseDto(chapter);
   }
 
   async create(dto: CreateChapterDto) {
     try {
-      return await this.prisma.chapter.create({
+      const chapter = await this.prisma.chapter.create({
         data: {
           novelId: dto.novelId,
           chapterNumber: dto.chapterNumber,
@@ -105,6 +110,8 @@ export class ChaptersService {
           content: dto.content,
         },
       });
+
+      return toChapterResponseDto(chapter);
     } catch (error) {
       this.handleKnownError(error);
       throw error;
@@ -113,7 +120,7 @@ export class ChaptersService {
 
   async update(id: string, dto: UpdateChapterDto) {
     try {
-      return await this.prisma.chapter.update({
+      const chapter = await this.prisma.chapter.update({
         where: { id },
         data: {
           novelId: dto.novelId,
@@ -122,6 +129,8 @@ export class ChaptersService {
           content: dto.content,
         },
       });
+
+      return toChapterResponseDto(chapter);
     } catch (error) {
       this.handleKnownError(error);
       throw error;
@@ -130,7 +139,9 @@ export class ChaptersService {
 
   async delete(id: string) {
     try {
-      return await this.prisma.chapter.delete({ where: { id } });
+      const chapter = await this.prisma.chapter.delete({ where: { id } });
+
+      return toChapterResponseDto(chapter);
     } catch (error) {
       this.handleKnownError(error);
       throw error;

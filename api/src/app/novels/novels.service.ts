@@ -53,7 +53,12 @@ export class NovelsService {
       this.prisma.novel.count({ where }),
     ]);
 
-    return toPaginatedResponse(items, total, query.page, query.pageSize);
+    return toPaginatedResponse(
+      items.map(toNovelResponseDto),
+      total,
+      query.page,
+      query.pageSize,
+    );
   }
 
   async findPublishedBySlug(slug: string) {
@@ -75,12 +80,12 @@ export class NovelsService {
       throw new NotFoundException('Novel was not found.');
     }
 
-    return novel;
+    return toNovelResponseDto(novel);
   }
 
   async create(dto: CreateNovelDto) {
     try {
-      return await this.prisma.novel.create({
+      const novel = await this.prisma.novel.create({
         data: {
           title: dto.title,
           slug: this.toSlug(dto.slug ?? dto.title),
@@ -89,6 +94,8 @@ export class NovelsService {
           status: dto.status ?? NovelStatus.DRAFT,
         },
       });
+
+      return toNovelResponseDto(novel);
     } catch (error) {
       this.handleKnownError(error);
       throw error;
@@ -97,7 +104,7 @@ export class NovelsService {
 
   async update(id: string, dto: UpdateNovelDto) {
     try {
-      return await this.prisma.novel.update({
+      const novel = await this.prisma.novel.update({
         where: { id },
         data: {
           title: dto.title,
@@ -107,6 +114,8 @@ export class NovelsService {
           status: dto.status,
         },
       });
+
+      return toNovelResponseDto(novel);
     } catch (error) {
       this.handleKnownError(error);
       throw error;
@@ -115,7 +124,9 @@ export class NovelsService {
 
   async delete(id: string) {
     try {
-      return await this.prisma.novel.delete({ where: { id } });
+      const novel = await this.prisma.novel.delete({ where: { id } });
+
+      return toNovelResponseDto(novel);
     } catch (error) {
       this.handleKnownError(error);
       throw error;
