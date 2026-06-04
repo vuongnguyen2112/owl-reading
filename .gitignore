@@ -28,6 +28,9 @@ node_modules
 /.sass-cache
 /connect.lock
 /coverage
+.env
+.env.*
+!.env.example
 /libpeerconnection.log
 npm-debug.log
 yarn-error.log
@@ -46,3 +49,6 @@ Thumbs.db
 .angular
 
 __screenshots__/
+
+vitest.config.*.timestamp*
+/generated/prisma

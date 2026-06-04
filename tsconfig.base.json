@@ -13,7 +13,11 @@
     "lib": ["es2020", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
-    "paths": {}
+    "paths": {
+      "@owl-reading/shared-types": ["./shared-types/src/index.ts"],
+      "@owl-reading/shared-ui": ["./shared-ui/src/index.ts"],
+      "@owl-reading/shared-utils": ["./libs/shared-utils/src/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }

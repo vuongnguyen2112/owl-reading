@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: owl-reading-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: owl_reading
+    ports:
+      - '5432:5432'
+    volumes:
+      - owl_reading_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  owl_reading_postgres_data:

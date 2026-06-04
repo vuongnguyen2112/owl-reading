@@ -1,0 +1,81 @@
+<header class="page-header">
+  <p class="eyebrow">Catalog</p>
+  <h1>Published novels</h1>
+</header>
+
+<form class="search-row" (ngSubmit)="applySearch()">
+  <mat-form-field appearance="outline">
+    <mat-label>Search by title</mat-label>
+    <input
+      matInput
+      name="search"
+      [ngModel]="search()"
+      (ngModelChange)="search.set($event)"
+    />
+  </mat-form-field>
+  <button mat-flat-button color="primary" type="submit">Search</button>
+  @if (search()) {
+  <button mat-button type="button" (click)="clearSearch()">Clear</button>
+  }
+</form>
+
+@if (state().loading && !novels().length) {
+<section class="state-panel">
+  <mat-spinner diameter="36"></mat-spinner>
+</section>
+} @else if (state().error) {
+<section class="state-panel">
+  <h2>Could not load novels</h2>
+  <p>{{ state().error }}</p>
+  <button mat-stroked-button type="button" (click)="loadNovels()">Retry</button>
+</section>
+} @else if (!novels().length) {
+<section class="state-panel">
+  <h2>No matching novels</h2>
+  <p>Try another title or clear the search.</p>
+</section>
+} @else {
+<section class="result-meta">
+  <span>{{ total() }} novels</span>
+  @if (state().loading) {
+  <span>Refreshing...</span>
+  }
+</section>
+
+<section class="novel-grid">
+  @for (novel of novels(); track novel.id) {
+  <mat-card class="novel-card">
+    <mat-card-header>
+      <mat-card-title>{{ novel.title }}</mat-card-title>
+      <mat-card-subtitle>Published</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <p>{{ novel.description || 'No description available.' }}</p>
+    </mat-card-content>
+    <mat-card-actions>
+      <a mat-button [routerLink]="['/novels', novel.slug]">Open</a>
+    </mat-card-actions>
+  </mat-card>
+  }
+</section>
+
+<nav class="pagination" aria-label="Novel pages">
+  <button
+    mat-stroked-button
+    type="button"
+    [disabled]="!hasPreviousPage()"
+    (click)="goToPreviousPage()"
+  >
+    Previous
+  </button>
+  <span>Page {{ page() }}</span>
+  <button
+    mat-stroked-button
+    type="button"
+    [disabled]="!hasNextPage()"
+    (click)="goToNextPage()"
+  >
+    Next
+  </button>
+</nav>
+}

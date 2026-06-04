@@ -1,0 +1,82 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum NovelStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model User {
+  id              String            @id @default(uuid())
+  email           String            @unique
+  passwordHash    String
+  displayName     String?
+  bookmarks       Bookmark[]
+  readingProgress ReadingProgress[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+}
+
+model Novel {
+  id              String            @id @default(uuid())
+  title           String
+  slug            String            @unique
+  description     String?
+  coverImageUrl   String?
+  status          NovelStatus       @default(DRAFT)
+  chapters        Chapter[]
+  readingProgress ReadingProgress[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+}
+
+model Chapter {
+  id              String            @id @default(uuid())
+  novelId         String
+  novel           Novel             @relation(fields: [novelId], references: [id], onDelete: Cascade)
+  chapterNumber   Int
+  title           String
+  content         String
+  bookmarks       Bookmark[]
+  readingProgress ReadingProgress[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@unique([novelId, chapterNumber])
+  @@index([novelId])
+}
+
+model Bookmark {
+  id        String   @id @default(uuid())
+  userId    String
+  chapterId String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chapter   Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, chapterId])
+  @@index([userId])
+  @@index([chapterId])
+}
+
+model ReadingProgress {
+  id         String   @id @default(uuid())
+  userId     String
+  novelId    String
+  chapterId  String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  novel      Novel    @relation(fields: [novelId], references: [id], onDelete: Cascade)
+  chapter    Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  lastReadAt DateTime @default(now())
+
+  @@unique([userId, novelId])
+  @@index([userId])
+  @@index([novelId])
+  @@index([chapterId])
+}

@@ -1,0 +1,64 @@
+@if (state().loading) {
+<section class="state-panel">
+  <mat-spinner diameter="36"></mat-spinner>
+</section>
+} @else if (state().error) {
+<section class="state-panel">
+  <h1>Novel unavailable</h1>
+  <p>{{ state().error }}</p>
+  <button mat-stroked-button type="button" (click)="loadNovel()">Retry</button>
+  <a mat-button routerLink="/novels">Back to novels</a>
+</section>
+} @else if (novel()) {
+<article class="detail-layout">
+  <header class="novel-header">
+    <p class="eyebrow">Published novel</p>
+    <h1>{{ novel()?.title }}</h1>
+    <p>{{ novel()?.description || 'No description available.' }}</p>
+    <a
+      mat-flat-button
+      color="primary"
+      [routerLink]="[
+          '/novels',
+          novel()?.slug,
+          'chapters',
+          chapters()[0]?.chapterNumber || 1
+        ]"
+      [class.disabled-link]="!chapters().length"
+      >Start reading</a
+    >
+  </header>
+
+  <mat-card class="chapter-panel">
+    <mat-card-header>
+      <mat-card-title>Chapters</mat-card-title>
+      <mat-card-subtitle>{{ chapters().length }} available</mat-card-subtitle>
+    </mat-card-header>
+    <mat-divider></mat-divider>
+
+    @if (!chapters().length) {
+    <mat-card-content>
+      <p class="empty-copy">No chapters are available for this novel yet.</p>
+    </mat-card-content>
+    } @else {
+    <mat-list>
+      @for (chapter of chapters(); track chapter.id) {
+      <a
+        mat-list-item
+        [routerLink]="[
+                '/novels',
+                novel()?.slug,
+                'chapters',
+                chapter.chapterNumber
+              ]"
+      >
+        <span matListItemTitle>
+          {{ chapter.chapterNumber }}. {{ chapter.title }}
+        </span>
+      </a>
+      }
+    </mat-list>
+    }
+  </mat-card>
+</article>
+}

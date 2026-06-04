@@ -1,0 +1,25 @@
+packages:
+  - 'apps/*'
+  - 'libs/*'
+  - 'admin-dashboard'
+  - 'admin-dashboard-e2e'
+  - 'api'
+  - 'api-e2e'
+  - 'shared-types'
+  - 'shared-ui'
+
+onlyBuiltDependencies:
+  - '@nestjs/core'
+  - '@parcel/watcher'
+  - '@prisma/engines'
+  - '@swc/core'
+  - esbuild
+  - less
+  - lmdb
+  - msgpackr-extract
+  - nx
+  - prisma
+  - unrs-resolver
+
+ignoredBuiltDependencies:
+  - '@scarf/scarf'

@@ -1,0 +1,71 @@
+.page-header {
+  margin-bottom: 18px;
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: 2.2rem;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: var(--app-accent);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.search-row {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.search-row mat-form-field {
+  width: 100%;
+}
+
+.result-meta,
+.pagination {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--app-muted);
+}
+
+.novel-grid {
+  display: grid;
+  gap: 14px;
+  margin: 14px 0 20px;
+}
+
+.novel-card {
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  box-shadow: none;
+}
+
+.novel-card p {
+  color: var(--app-muted);
+}
+
+.state-panel {
+  display: grid;
+  min-height: 260px;
+  place-items: center;
+  gap: 12px;
+  padding: 28px;
+  text-align: center;
+}
+
+@media (min-width: 680px) {
+  .search-row {
+    grid-template-columns: 1fr auto auto;
+    align-items: start;
+  }
+
+  .novel-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

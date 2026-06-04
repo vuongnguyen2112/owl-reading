@@ -1,0 +1,62 @@
+.reader-layout {
+  display: grid;
+  gap: 16px;
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+.reader-nav,
+.chapter-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.reader-nav span {
+  color: var(--app-muted);
+  font-size: 0.9rem;
+}
+
+.reader-card {
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  box-shadow: none;
+}
+
+.chapter-header {
+  padding: 24px 24px 18px;
+}
+
+.chapter-header p {
+  margin: 0 0 6px;
+  color: var(--app-accent);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.chapter-header h1 {
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1.15;
+}
+
+.chapter-content {
+  padding: 22px 24px 30px;
+  font-size: 1.08rem;
+  line-height: 1.75;
+}
+
+.chapter-content p {
+  margin: 0 0 1.25rem;
+}
+
+.state-panel {
+  display: grid;
+  min-height: 320px;
+  place-items: center;
+  gap: 12px;
+  padding: 28px;
+  text-align: center;
+}

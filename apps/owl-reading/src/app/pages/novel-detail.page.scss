@@ -1,0 +1,58 @@
+.detail-layout {
+  display: grid;
+  gap: 20px;
+}
+
+.novel-header {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+
+.novel-header h1 {
+  margin: 0;
+  font-size: 2.35rem;
+  line-height: 1.08;
+}
+
+.novel-header p {
+  margin: 0;
+  color: var(--app-muted);
+}
+
+.eyebrow {
+  color: var(--app-accent);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.chapter-panel {
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  box-shadow: none;
+}
+
+.empty-copy {
+  color: var(--app-muted);
+}
+
+.disabled-link {
+  pointer-events: none;
+  opacity: 0.55;
+}
+
+.state-panel {
+  display: grid;
+  min-height: 320px;
+  place-items: center;
+  gap: 12px;
+  padding: 28px;
+  text-align: center;
+}
+
+@media (min-width: 820px) {
+  .detail-layout {
+    grid-template-columns: minmax(0, 0.9fr) minmax(360px, 1.1fr);
+  }
+}

@@ -1,2 +1,16 @@
-<app-nx-welcome></app-nx-welcome>
-<router-outlet></router-outlet>
+<mat-toolbar class="topbar">
+  <a class="brand" routerLink="/">{{ title }}</a>
+  <span class="topbar-spacer"></span>
+  <a
+    mat-button
+    routerLink="/"
+    routerLinkActive="active-link"
+    [routerLinkActiveOptions]="{ exact: true }"
+    >Home</a
+  >
+  <a mat-button routerLink="/novels" routerLinkActive="active-link">Novels</a>
+</mat-toolbar>
+
+<main class="app-shell">
+  <router-outlet></router-outlet>
+</main>

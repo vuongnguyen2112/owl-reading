@@ -1,0 +1,80 @@
+.hero {
+  display: grid;
+  gap: 20px;
+  align-items: stretch;
+  padding: 16px 0 28px;
+}
+
+.hero-copy {
+  display: grid;
+  gap: 14px;
+  align-content: center;
+}
+
+.hero-copy h1 {
+  margin: 0;
+  max-width: 760px;
+  font-size: 2rem;
+  line-height: 1.02;
+}
+
+.hero-copy p {
+  max-width: 660px;
+  margin: 0;
+  color: var(--app-muted);
+}
+
+.eyebrow {
+  color: var(--app-accent);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.featured-card,
+.novel-card {
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  box-shadow: none;
+}
+
+.section-header {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  margin: 10px 0 14px;
+}
+
+.section-header h2 {
+  margin: 0;
+}
+
+.novel-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.novel-card p {
+  color: var(--app-muted);
+}
+
+.state-panel {
+  display: grid;
+  min-height: 220px;
+  place-items: center;
+  gap: 12px;
+  padding: 28px;
+  text-align: center;
+}
+
+@media (min-width: 760px) {
+  .hero-copy h1 {
+    font-size: 4rem;
+  }
+
+  .hero,
+  .novel-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

@@ -1,0 +1,65 @@
+@if (state().loading) {
+<section class="state-panel">
+  <mat-spinner diameter="36"></mat-spinner>
+</section>
+} @else if (state().error) {
+<section class="state-panel">
+  <h1>Chapter unavailable</h1>
+  <p>{{ state().error }}</p>
+  <button mat-stroked-button type="button" (click)="loadChapter()">
+    Retry
+  </button>
+  <a mat-button [routerLink]="['/novels', slug()]">Back to novel</a>
+</section>
+} @else if (chapter() && novel()) {
+<article class="reader-layout">
+  <nav class="reader-nav" aria-label="Chapter navigation">
+    <a mat-button [routerLink]="['/novels', novel()?.slug]">Novel details</a>
+    <span>{{ novel()?.title }}</span>
+  </nav>
+
+  <mat-card class="reader-card">
+    <header class="chapter-header">
+      <p>Chapter {{ chapter()?.chapterNumber }}</p>
+      <h1>{{ chapter()?.title }}</h1>
+    </header>
+
+    <mat-divider></mat-divider>
+
+    <section class="chapter-content">
+      @for (paragraph of paragraphs(); track paragraph) {
+      <p>{{ paragraph }}</p>
+      }
+    </section>
+  </mat-card>
+
+  <nav class="chapter-actions" aria-label="Adjacent chapters">
+    @if (previousChapter()) {
+    <a
+      mat-stroked-button
+      [routerLink]="[
+            '/novels',
+            novel()?.slug,
+            'chapters',
+            previousChapter()?.chapterNumber
+          ]"
+      >Previous</a
+    >
+    } @else {
+    <span></span>
+    } @if (nextChapter()) {
+    <a
+      mat-flat-button
+      color="primary"
+      [routerLink]="[
+            '/novels',
+            novel()?.slug,
+            'chapters',
+            nextChapter()?.chapterNumber
+          ]"
+      >Next</a
+    >
+    }
+  </nav>
+</article>
+}
