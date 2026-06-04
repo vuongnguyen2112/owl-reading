@@ -6,6 +6,7 @@ import { environmentValidationSchema } from './config/environment.validation';
 import { DatabaseModule } from './database/database.module';
 import { HealthModule } from './health/health.module';
 import { NovelsModule } from './novels/novels.module';
+import { ReadingProgressModule } from './reading-progress/reading-progress.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { NovelsModule } from './novels/novels.module';
     HealthModule,
     ChaptersModule,
     NovelsModule,
+    ReadingProgressModule,
   ],
 })
 export class AppModule {}

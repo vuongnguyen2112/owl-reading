@@ -22,10 +22,10 @@
           '/novels',
           novel()?.slug,
           'chapters',
-          chapters()[0]?.chapterNumber || 1
+          startChapterNumber()
         ]"
       [class.disabled-link]="!chapters().length"
-      >Start reading</a
+      >{{ startReadingLabel() }}</a
     >
   </header>
 

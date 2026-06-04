@@ -26,6 +26,15 @@ export interface Chapter {
   updatedAt: string;
 }
 
+export interface ReadingProgress {
+  id: string;
+  novelId: string;
+  novelSlug: string;
+  chapterId: string;
+  chapterNumber: number;
+  lastReadAt: string;
+}
+
 export interface ListNovelsParams {
   page?: number;
   pageSize?: number;
@@ -35,4 +44,9 @@ export interface ListNovelsParams {
 export interface ListChaptersParams {
   page?: number;
   pageSize?: number;
+}
+
+export interface SaveReadingProgressRequest {
+  novelId: string;
+  chapterId: string;
 }

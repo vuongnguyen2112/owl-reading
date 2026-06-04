@@ -102,7 +102,16 @@ export class ChapterReaderPage {
     })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (data) => this.state.set({ data, loading: false, error: null }),
+        next: (data) => {
+          this.state.set({ data, loading: false, error: null });
+          this.novelApi
+            .saveReadingProgress({
+              novelId: data.novel.id,
+              chapterId: data.chapter.id,
+            })
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe();
+        },
         error: (error) =>
           this.state.set({
             data: null,
