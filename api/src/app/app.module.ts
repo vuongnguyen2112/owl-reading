@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { AuthModule } from './auth/auth.module';
 import { ChaptersModule } from './chapters/chapters.module';
 import { environmentValidationSchema } from './config/environment.validation';
 import { DatabaseModule } from './database/database.module';
@@ -17,6 +18,7 @@ import { NovelsModule } from './novels/novels.module';
         allowUnknown: true,
       },
     }),
+    AuthModule,
     DatabaseModule,
     HealthModule,
     ChaptersModule,

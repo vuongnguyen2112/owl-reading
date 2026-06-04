@@ -2,7 +2,7 @@ require('dotenv/config');
 
 const { PrismaPg } = require('@prisma/adapter-pg');
 const { PrismaClient } = require('@prisma/client');
-const { createHash } = require('node:crypto');
+const { randomBytes, scryptSync } = require('node:crypto');
 
 if (process.env.NODE_ENV === 'production') {
   throw new Error('Refusing to run the development seed script in production.');
@@ -22,12 +22,18 @@ const prisma = new PrismaClient({
   log: ['warn', 'error'],
 });
 
+function hashPassword(password) {
+  const salt = randomBytes(16).toString('base64url');
+  const derivedKey = scryptSync(password, salt, 64);
+
+  return `scrypt:${salt}:${derivedKey.toString('base64url')}`;
+}
+
 const testUser = {
   email: 'reader@example.com',
   displayName: 'Test Reader',
-  passwordHash: `sha256:${createHash('sha256')
-    .update('password123')
-    .digest('hex')}`,
+  passwordHash: hashPassword('password123'),
+  role: 'USER',
 };
 
 const novels = [
