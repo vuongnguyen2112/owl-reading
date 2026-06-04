@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
+import { BookmarksModule } from './bookmarks/bookmarks.module';
 import { ChaptersModule } from './chapters/chapters.module';
 import { environmentValidationSchema } from './config/environment.validation';
 import { DatabaseModule } from './database/database.module';
@@ -25,6 +26,7 @@ import { ReadingProgressModule } from './reading-progress/reading-progress.modul
     ChaptersModule,
     NovelsModule,
     ReadingProgressModule,
+    BookmarksModule,
   ],
 })
 export class AppModule {}

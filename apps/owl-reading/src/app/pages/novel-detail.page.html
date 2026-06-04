@@ -27,6 +27,11 @@
       [class.disabled-link]="!chapters().length"
       >{{ startReadingLabel() }}</a
     >
+    @if (canBookmark()) {
+    <button mat-stroked-button type="button" (click)="toggleNovelBookmark()">
+      {{ novelBookmark() ? 'Remove bookmark' : 'Bookmark novel' }}
+    </button>
+    }
   </header>
 
   <mat-card class="chapter-panel">

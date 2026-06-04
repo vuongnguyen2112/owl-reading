@@ -8,6 +8,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import {
+  Bookmark,
   Chapter,
   Novel,
   PaginatedResponse,
@@ -24,6 +25,7 @@ interface NovelDetailData {
   novel: Novel;
   chapters: PaginatedResponse<Chapter>;
   progress: ReadingProgress | null;
+  bookmarks: Bookmark[];
 }
 
 @Component({
@@ -61,6 +63,22 @@ export class NovelDetailPage {
   protected readonly startReadingLabel = computed(() =>
     this.state().data?.progress ? 'Continue reading' : 'Start reading',
   );
+  protected readonly canBookmark = computed(() =>
+    this.novelApi.isAuthenticated(),
+  );
+  protected readonly novelBookmark = computed(() => {
+    const novel = this.novel();
+
+    if (!novel) {
+      return null;
+    }
+
+    return (
+      this.state().data?.bookmarks.find(
+        (bookmark) => bookmark.novelId === novel.id && !bookmark.chapterId,
+      ) ?? null
+    );
+  });
 
   constructor() {
     this.route.paramMap.pipe(takeUntilDestroyed()).subscribe((params) => {
@@ -83,9 +101,19 @@ export class NovelDetailPage {
     })
       .pipe(
         switchMap((data) =>
-          this.novelApi.getReadingProgress(data.novel.id).pipe(
-            map((progress) => ({ ...data, progress })),
-            catchError(() => of({ ...data, progress: null })),
+          forkJoin({
+            progress: this.novelApi
+              .getReadingProgress(data.novel.id)
+              .pipe(catchError(() => of(null))),
+            bookmarks: this.novelApi
+              .listBookmarks()
+              .pipe(catchError(() => of([]))),
+          }).pipe(
+            map(({ progress, bookmarks }) => ({
+              ...data,
+              progress,
+              bookmarks,
+            })),
           ),
         ),
       )
@@ -99,5 +127,65 @@ export class NovelDetailPage {
             error: getErrorMessage(error),
           }),
       });
+  }
+
+  protected toggleNovelBookmark() {
+    const novel = this.novel();
+
+    if (!novel) {
+      return;
+    }
+
+    const existingBookmark = this.novelBookmark();
+
+    if (existingBookmark) {
+      this.novelApi
+        .removeBookmark(existingBookmark.id)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(() => this.removeBookmarkFromState(existingBookmark.id));
+      return;
+    }
+
+    this.novelApi
+      .createBookmark({ novelId: novel.id })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((bookmark) => this.addBookmarkToState(bookmark));
+  }
+
+  private addBookmarkToState(bookmark: Bookmark) {
+    const current = this.state().data;
+
+    if (!current) {
+      return;
+    }
+
+    this.state.set({
+      data: {
+        ...current,
+        bookmarks: [
+          bookmark,
+          ...current.bookmarks.filter((item) => item.id !== bookmark.id),
+        ],
+      },
+      loading: false,
+      error: null,
+    });
+  }
+
+  private removeBookmarkFromState(id: string) {
+    const current = this.state().data;
+
+    if (!current) {
+      return;
+    }
+
+    this.state.set({
+      data: {
+        ...current,
+        bookmarks: current.bookmarks.filter((bookmark) => bookmark.id !== id),
+      },
+      loading: false,
+      error: null,
+    });
   }
 }

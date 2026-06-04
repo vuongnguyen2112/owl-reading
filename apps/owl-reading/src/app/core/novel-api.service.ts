@@ -2,7 +2,9 @@ import { EMPTY, of } from 'rxjs';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import {
+  Bookmark,
   Chapter,
+  CreateBookmarkRequest,
   ListChaptersParams,
   ListNovelsParams,
   Novel,
@@ -71,6 +73,47 @@ export class NovelApiService {
     );
   }
 
+  listBookmarks() {
+    const headers = this.getAuthHeaders();
+
+    if (!headers) {
+      return of<Bookmark[]>([]);
+    }
+
+    return this.http.get<Bookmark[]>(`${API_BASE_URL}/bookmarks`, {
+      headers,
+    });
+  }
+
+  createBookmark(request: CreateBookmarkRequest) {
+    const headers = this.getAuthHeaders();
+
+    if (!headers) {
+      return EMPTY;
+    }
+
+    return this.http.post<Bookmark>(`${API_BASE_URL}/bookmarks`, request, {
+      headers,
+    });
+  }
+
+  removeBookmark(id: string) {
+    const headers = this.getAuthHeaders();
+
+    if (!headers) {
+      return EMPTY;
+    }
+
+    return this.http.delete<{ success: true }>(
+      `${API_BASE_URL}/bookmarks/${encodeURIComponent(id)}`,
+      { headers },
+    );
+  }
+
+  isAuthenticated() {
+    return Boolean(this.getAuthHeaders());
+  }
+
   private toHttpParams(params: ListNovelsParams | ListChaptersParams) {
     let httpParams = new HttpParams();
 
@@ -86,8 +129,6 @@ export class NovelApiService {
   private getAuthHeaders() {
     const token = globalThis.sessionStorage?.getItem(ACCESS_TOKEN_STORAGE_KEY);
 
-    return token
-      ? new HttpHeaders({ Authorization: `Bearer ${token}` })
-      : null;
+    return token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : null;
   }
 }

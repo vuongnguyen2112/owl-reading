@@ -51,6 +51,7 @@ model Novel {
   description     String?
   coverImageUrl   String?
   status          NovelStatus       @default(DRAFT)
+  bookmarks       Bookmark[]
   chapters        Chapter[]
   readingProgress ReadingProgress[]
   createdAt       DateTime          @default(now())
@@ -78,13 +79,17 @@ model Chapter {
 model Bookmark {
   id        String   @id @default(uuid())
   userId    String
-  chapterId String
+  novelId   String?
+  chapterId String?
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  chapter   Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  novel     Novel?   @relation(fields: [novelId], references: [id], onDelete: Cascade)
+  chapter   Chapter? @relation(fields: [chapterId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 
+  @@unique([userId, novelId])
   @@unique([userId, chapterId])
   @@index([userId])
+  @@index([novelId])
   @@index([chapterId])
 }
 

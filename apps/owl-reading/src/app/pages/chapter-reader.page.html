@@ -22,6 +22,15 @@
     <header class="chapter-header">
       <p>Chapter {{ chapter()?.chapterNumber }}</p>
       <h1>{{ chapter()?.title }}</h1>
+      @if (canBookmark()) {
+      <button
+        mat-stroked-button
+        type="button"
+        (click)="toggleChapterBookmark()"
+      >
+        {{ chapterBookmark() ? 'Remove bookmark' : 'Bookmark chapter' }}
+      </button>
+      }
     </header>
 
     <mat-divider></mat-divider>

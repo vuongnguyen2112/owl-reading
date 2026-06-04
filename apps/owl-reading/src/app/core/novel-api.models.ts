@@ -35,6 +35,17 @@ export interface ReadingProgress {
   lastReadAt: string;
 }
 
+export interface Bookmark {
+  id: string;
+  novelId: string | null;
+  novelSlug: string | null;
+  novelTitle: string | null;
+  chapterId: string | null;
+  chapterNumber: number | null;
+  chapterTitle: string | null;
+  createdAt: string;
+}
+
 export interface ListNovelsParams {
   page?: number;
   pageSize?: number;
@@ -49,4 +60,9 @@ export interface ListChaptersParams {
 export interface SaveReadingProgressRequest {
   novelId: string;
   chapterId: string;
+}
+
+export interface CreateBookmarkRequest {
+  novelId?: string;
+  chapterId?: string;
 }
