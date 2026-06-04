@@ -11,6 +11,8 @@ import {
   PaginatedResponse,
   ReadingProgress,
   SaveReadingProgressRequest,
+  UpdateUserProfileRequest,
+  UserProfile,
 } from './novel-api.models';
 import { environment } from '../../environments/environment';
 
@@ -108,6 +110,30 @@ export class NovelApiService {
       `${API_BASE_URL}/bookmarks/${encodeURIComponent(id)}`,
       { headers },
     );
+  }
+
+  getCurrentUserProfile() {
+    const headers = this.getAuthHeaders();
+
+    if (!headers) {
+      return of<UserProfile | null>(null);
+    }
+
+    return this.http.get<UserProfile>(`${API_BASE_URL}/users/me`, {
+      headers,
+    });
+  }
+
+  updateCurrentUserProfile(request: UpdateUserProfileRequest) {
+    const headers = this.getAuthHeaders();
+
+    if (!headers) {
+      return EMPTY;
+    }
+
+    return this.http.put<UserProfile>(`${API_BASE_URL}/users/me`, request, {
+      headers,
+    });
   }
 
   isAuthenticated() {

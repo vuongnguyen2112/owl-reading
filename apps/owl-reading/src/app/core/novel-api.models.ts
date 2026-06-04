@@ -46,6 +46,14 @@ export interface Bookmark {
   createdAt: string;
 }
 
+export interface UserProfile {
+  id: string;
+  email: string;
+  displayName: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface ListNovelsParams {
   page?: number;
   pageSize?: number;
@@ -65,4 +73,8 @@ export interface SaveReadingProgressRequest {
 export interface CreateBookmarkRequest {
   novelId?: string;
   chapterId?: string;
+}
+
+export interface UpdateUserProfileRequest {
+  displayName?: string | null;
 }

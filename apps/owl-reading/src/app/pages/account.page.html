@@ -1,0 +1,61 @@
+<header class="page-header">
+  <p class="eyebrow">Account</p>
+  <h1>Your profile</h1>
+</header>
+
+@if (!isAuthenticated()) {
+<section class="state-panel">
+  <h2>Sign in required</h2>
+  <p>Your profile is available after you sign in.</p>
+  <a mat-button routerLink="/">Back home</a>
+</section>
+} @else if (state().loading && !profile()) {
+<section class="state-panel">
+  <mat-spinner diameter="36"></mat-spinner>
+</section>
+} @else if (state().error && !profile()) {
+<section class="state-panel">
+  <h2>Could not load profile</h2>
+  <p>{{ state().error }}</p>
+  <button mat-stroked-button type="button" (click)="loadProfile()">
+    Retry
+  </button>
+</section>
+} @else if (profile()) {
+<mat-card class="profile-card">
+  <mat-card-header>
+    <mat-card-title>{{ profile()?.email }}</mat-card-title>
+    <mat-card-subtitle>Reader account</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <form class="profile-form" (ngSubmit)="saveProfile()">
+      <mat-form-field appearance="outline">
+        <mat-label>Display name</mat-label>
+        <input
+          matInput
+          maxlength="100"
+          name="displayName"
+          [ngModel]="displayName()"
+          (ngModelChange)="displayName.set($event)"
+        />
+      </mat-form-field>
+
+      @if (state().error) {
+      <p class="error-copy">{{ state().error }}</p>
+      } @if (saved()) {
+      <p class="success-copy">Profile saved.</p>
+      }
+
+      <button
+        mat-flat-button
+        color="primary"
+        type="submit"
+        [disabled]="saving()"
+      >
+        {{ saving() ? 'Saving...' : 'Save profile' }}
+      </button>
+    </form>
+  </mat-card-content>
+</mat-card>
+}

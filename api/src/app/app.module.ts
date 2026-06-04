@@ -8,6 +8,7 @@ import { DatabaseModule } from './database/database.module';
 import { HealthModule } from './health/health.module';
 import { NovelsModule } from './novels/novels.module';
 import { ReadingProgressModule } from './reading-progress/reading-progress.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { ReadingProgressModule } from './reading-progress/reading-progress.modul
     NovelsModule,
     ReadingProgressModule,
     BookmarksModule,
+    UsersModule,
   ],
 })
 export class AppModule {}

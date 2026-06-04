@@ -26,6 +26,11 @@ export const appRoutes: Route[] = [
       ),
   },
   {
+    path: 'account',
+    loadComponent: () =>
+      import('./pages/account.page').then((module) => module.AccountPage),
+  },
+  {
     path: '**',
     redirectTo: '',
   },
