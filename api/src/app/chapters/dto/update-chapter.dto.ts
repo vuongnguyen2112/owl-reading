@@ -8,6 +8,7 @@ import {
   Min,
   MinLength,
 } from 'class-validator';
+import { CHAPTER_CONTENT_MAX_LENGTH } from './chapter-content-limits';
 
 export class UpdateChapterDto {
   @ApiPropertyOptional()
@@ -32,5 +33,6 @@ export class UpdateChapterDto {
   @IsOptional()
   @IsString()
   @MinLength(1)
+  @MaxLength(CHAPTER_CONTENT_MAX_LENGTH)
   content?: string;
 }

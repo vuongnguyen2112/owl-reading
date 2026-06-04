@@ -1,0 +1,1 @@
+export const CHAPTER_CONTENT_MAX_LENGTH = 500_000;

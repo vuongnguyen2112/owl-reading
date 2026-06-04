@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
   Query,
@@ -64,7 +65,7 @@ export class AdminNovelsController {
   @Get(':id')
   @ApiOperation({ summary: 'Get a novel by id for admin.' })
   @ApiOkResponse({ type: NovelResponseDto })
-  findAdminById(@Param('id') id: string) {
+  findAdminById(@Param('id', ParseUUIDPipe) id: string) {
     return this.novelsService.findAdminById(id);
   }
 
@@ -78,14 +79,14 @@ export class AdminNovelsController {
   @Patch(':id')
   @ApiOperation({ summary: 'Update a novel.' })
   @ApiOkResponse({ type: NovelResponseDto })
-  update(@Param('id') id: string, @Body() dto: UpdateNovelDto) {
+  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateNovelDto) {
     return this.novelsService.update(id, dto);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a novel.' })
   @ApiOkResponse({ type: NovelResponseDto })
-  delete(@Param('id') id: string) {
+  delete(@Param('id', ParseUUIDPipe) id: string) {
     return this.novelsService.delete(id);
   }
 }

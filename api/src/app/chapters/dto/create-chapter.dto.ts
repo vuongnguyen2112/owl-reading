@@ -7,6 +7,7 @@ import {
   Min,
   MinLength,
 } from 'class-validator';
+import { CHAPTER_CONTENT_MAX_LENGTH } from './chapter-content-limits';
 
 export class CreateChapterDto {
   @ApiProperty()
@@ -27,5 +28,6 @@ export class CreateChapterDto {
   @ApiProperty()
   @IsString()
   @MinLength(1)
+  @MaxLength(CHAPTER_CONTENT_MAX_LENGTH)
   content!: string;
 }

@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  ParseUUIDPipe,
   Patch,
   Post,
   Query,
@@ -75,7 +76,7 @@ export class AdminChaptersController {
   @Get(':id')
   @ApiOperation({ summary: 'Get a chapter by id for admin.' })
   @ApiOkResponse({ type: ChapterResponseDto })
-  findAdminById(@Param('id') id: string) {
+  findAdminById(@Param('id', ParseUUIDPipe) id: string) {
     return this.chaptersService.findAdminById(id);
   }
 
@@ -89,14 +90,17 @@ export class AdminChaptersController {
   @Patch(':id')
   @ApiOperation({ summary: 'Update a chapter.' })
   @ApiOkResponse({ type: ChapterResponseDto })
-  update(@Param('id') id: string, @Body() dto: UpdateChapterDto) {
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: UpdateChapterDto,
+  ) {
     return this.chaptersService.update(id, dto);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a chapter.' })
   @ApiOkResponse({ type: ChapterResponseDto })
-  delete(@Param('id') id: string) {
+  delete(@Param('id', ParseUUIDPipe) id: string) {
     return this.chaptersService.delete(id);
   }
 }
