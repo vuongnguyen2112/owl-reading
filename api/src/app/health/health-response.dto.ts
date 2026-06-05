@@ -10,3 +10,8 @@ export class HealthResponseDto {
   @ApiProperty({ example: 42.12 })
   uptime!: number;
 }
+
+export class ReadinessResponseDto extends HealthResponseDto {
+  @ApiProperty({ example: 'ok' })
+  database!: 'ok';
+}

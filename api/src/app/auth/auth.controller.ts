@@ -9,6 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { SkipThrottle, ThrottlerGuard } from '@nestjs/throttler';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { AuthResponseDto, AuthUserResponseDto } from './dto/auth-response.dto';
 import { LoginDto } from './dto/login.dto';
@@ -36,6 +37,8 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
+  @UseGuards(ThrottlerGuard)
+  @SkipThrottle({ login: true, refresh: true })
   @ApiOkResponse({ type: AuthResponseDto })
   async register(
     @Body() dto: RegisterDto,
@@ -51,6 +54,8 @@ export class AuthController {
   }
 
   @Post('login')
+  @UseGuards(ThrottlerGuard)
+  @SkipThrottle({ register: true, refresh: true })
   @ApiOkResponse({ type: AuthResponseDto })
   async login(
     @Body() dto: LoginDto,
@@ -66,6 +71,8 @@ export class AuthController {
   }
 
   @Post('refresh')
+  @UseGuards(ThrottlerGuard)
+  @SkipThrottle({ login: true, register: true })
   @ApiOkResponse({ type: AuthResponseDto })
   async refresh(
     @Req() request: CookieRequest,

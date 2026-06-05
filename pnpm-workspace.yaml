@@ -23,3 +23,7 @@ onlyBuiltDependencies:
 
 ignoredBuiltDependencies:
   - '@scarf/scarf'
+
+allowBuilds:
+  '@nestjs/core': true
+  '@scarf/scarf': false

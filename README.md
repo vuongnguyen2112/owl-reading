@@ -40,6 +40,20 @@ Create or update `.env` with the local PostgreSQL connection string:
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/owl_reading?schema=public"
 ```
 
+For production deployments, set `NODE_ENV=production` and provide explicit
+values for `DATABASE_URL`, `CORS_ORIGINS`, `JWT_ACCESS_SECRET`,
+`JWT_REFRESH_SECRET`, and `AUTH_COOKIE_SECURE=true`. Production startup should
+fail if these critical settings are missing or unsafe.
+
+Auth endpoints are rate-limited with development-safe defaults:
+
+- Login: `AUTH_LOGIN_RATE_LIMIT_MAX=5` per
+  `AUTH_LOGIN_RATE_LIMIT_TTL_SECONDS=60`.
+- Register: `AUTH_REGISTER_RATE_LIMIT_MAX=3` per
+  `AUTH_REGISTER_RATE_LIMIT_TTL_SECONDS=60`.
+- Refresh: `AUTH_REFRESH_RATE_LIMIT_MAX=30` per
+  `AUTH_REFRESH_RATE_LIMIT_TTL_SECONDS=60`.
+
 Start PostgreSQL:
 
 ```sh
@@ -101,6 +115,14 @@ Default local URLs:
 - API: `http://localhost:3000/api`
 - PostgreSQL: `localhost:5432`
 
+Operational health endpoints:
+
+- Liveness: `GET /api/health` or `GET /api/health/live`
+- Readiness: `GET /api/health/ready`
+
+Use liveness to check that the API process is running. Use readiness after
+deployments to confirm the API can reach PostgreSQL.
+
 ## Quality Checks
 
 Run all CI-friendly checks:
@@ -124,6 +146,16 @@ Format the workspace:
 pnpm format
 ```
 
+## Production Smoke Checks
+
+After deployment, verify:
+
+- `GET /api/health/live` returns `200`.
+- `GET /api/health/ready` returns `200`.
+- `GET /api/health/ready` returns `503` if PostgreSQL is unavailable.
+- Swagger docs are not exposed at `/api/docs` when `NODE_ENV=production`.
+- Reader and admin production builds call the configured `/api` endpoint.
+
 ## Database
 
 Local PostgreSQL is defined in `docker-compose.yml` using PostgreSQL 16.
@@ -135,6 +167,10 @@ pnpm db:up
 pnpm db:down
 pnpm db:studio
 ```
+
+The seed script is for development data only. It refuses to run in production
+and also refuses non-local database hosts unless `ALLOW_DEV_SEED=true` is set
+for an intentional non-production environment.
 
 ## Local Admin User
 

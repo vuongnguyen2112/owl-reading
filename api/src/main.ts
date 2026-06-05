@@ -28,6 +28,7 @@ async function bootstrap() {
   );
 
   app.setGlobalPrefix(apiPrefix);
+  app.enableShutdownHooks();
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -61,4 +62,10 @@ async function bootstrap() {
   }
 }
 
-bootstrap();
+bootstrap().catch((error: unknown) => {
+  Logger.error(
+    'Failed to start application.',
+    error instanceof Error ? error.stack : String(error),
+  );
+  process.exit(1);
+});

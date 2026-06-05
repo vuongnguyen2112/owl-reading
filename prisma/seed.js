@@ -16,6 +16,16 @@ if (!connectionString) {
 
 const databaseUrl = new URL(connectionString);
 const schema = databaseUrl.searchParams.get('schema') ?? undefined;
+const localDatabaseHosts = new Set(['localhost', '127.0.0.1', '::1', 'postgres']);
+
+if (
+  !localDatabaseHosts.has(databaseUrl.hostname) &&
+  process.env.ALLOW_DEV_SEED !== 'true'
+) {
+  throw new Error(
+    'Refusing to run the development seed script against a non-local database. Set ALLOW_DEV_SEED=true only for an intentional non-production environment.',
+  );
+}
 
 const prisma = new PrismaClient({
   adapter: new PrismaPg(connectionString, { schema }),
