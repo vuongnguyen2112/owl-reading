@@ -58,6 +58,16 @@ Apply database migrations during local development:
 pnpm db:migrate
 ```
 
+Apply committed migrations in production or deployment environments:
+
+```sh
+pnpm db:migrate:deploy
+```
+
+Use `db:migrate` only while developing migrations locally. Use
+`db:migrate:deploy` during deployment; it applies existing migration files
+without creating new migrations.
+
 Validate the Prisma schema without changing the database:
 
 ```sh
