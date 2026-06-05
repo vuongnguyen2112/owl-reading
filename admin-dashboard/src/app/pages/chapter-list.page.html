@@ -21,7 +21,7 @@
 <mat-card class="error-card">
   <mat-card-content>{{ state().error }}</mat-card-content>
 </mat-card>
-} @if (state().loading && !chapters().length) {
+} @else if (state().loading && !chapters().length) {
 <section class="state-panel">
   <mat-spinner diameter="36"></mat-spinner>
 </section>
