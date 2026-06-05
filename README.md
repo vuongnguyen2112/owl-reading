@@ -148,6 +148,21 @@ pnpm format
 
 ## Production Smoke Checks
 
+Platform-neutral staging command sequence:
+
+```sh
+pnpm install
+pnpm build
+pnpm db:migrate:deploy
+pnpm start:api:prod
+```
+
+Current reader and admin production builds use same-origin `/api` as the API
+base URL. The first staging deployment should either serve the API on the same
+origin under `/api` or add platform-specific proxy/rewrites after choosing a
+host. No Vercel, Netlify, Render, Railway, or Docker deployment config is
+included yet.
+
 After deployment, verify:
 
 - `GET /api/health/live` returns `200`.

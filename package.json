@@ -7,6 +7,7 @@
     "dev:web": "nx serve owl-reading",
     "dev:admin": "nx serve admin-dashboard --port 4201",
     "dev:api": "nx serve api",
+    "start:api:prod": "node dist/api/main.js",
     "build": "nx run-many -t build --all",
     "lint": "nx run-many -t lint --all",
     "test": "nx run-many -t test --all",
