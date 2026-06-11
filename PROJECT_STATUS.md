@@ -95,16 +95,16 @@ Implemented:
 - Seed script refuses production and non-local DB unless explicitly allowed.
 - Admin promotion script refuses production unless explicitly allowed.
 - Health/readiness endpoints are available for deploy smoke checks.
+- Structured request logging is enabled.
+- A global exception filter logs structured exception events and hides unexpected 500 details from clients.
+- API startup success/failure logs are structured.
 - `pnpm verify` passes.
 
 Not implemented yet:
 
 - Dockerfiles.
 - Platform-specific deployment config.
-- Structured request logging.
-- Global exception filter.
 - Redis/distributed throttling.
-- CSRF protection.
 
 ## Railway Status
 
@@ -164,7 +164,7 @@ Security caveats:
 
 - Access token in `sessionStorage` is acceptable for MVP but remains XSS-sensitive.
 - Cross-site cookie staging requires `SameSite=None; Secure`.
-- CSRF protection has not been added yet.
+- Refresh/logout use Origin/Referer validation as an MVP CSRF mitigation.
 - Password reset, email verification, and MFA are not implemented.
 
 ## Admin Status
@@ -192,9 +192,6 @@ High-value remaining risks:
 - `README.md` still opens by describing the project as Phase 1 scaffolding with business features intentionally not implemented. That is stale.
 - No platform-specific Railway config yet.
 - No Dockerfiles yet.
-- No CSRF protection for refresh-cookie flow.
-- No structured request logging.
-- No global exception filter.
 - Rate limiting is in-memory only, not distributed.
 - Token storage is still `sessionStorage`, not an httpOnly access-token cookie.
 - Bookmark/progress failure UX is likely still minimal.

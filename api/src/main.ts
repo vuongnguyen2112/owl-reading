@@ -1,15 +1,13 @@
-/**
- * This is not a production server yet.
- * This is only a minimal backend to get started.
- */
-
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app/app.module';
+import { GlobalExceptionFilter } from './app/common/observability/global-exception.filter';
+import { requestLoggingMiddleware } from './app/common/observability/request-logging.middleware';
 
 const apiPrefix = 'api';
+const bootstrapLogger = new Logger('Bootstrap');
 
 function parseCorsOrigins(origins: string): string[] {
   return origins
@@ -29,6 +27,8 @@ async function bootstrap() {
 
   app.setGlobalPrefix(apiPrefix);
   app.enableShutdownHooks();
+  app.use(requestLoggingMiddleware);
+  app.useGlobalFilters(new GlobalExceptionFilter());
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -52,19 +52,30 @@ async function bootstrap() {
   }
 
   await app.listen(port);
-  Logger.log(
-    `Application is running on: http://localhost:${port}/${apiPrefix}`,
+  bootstrapLogger.log(
+    JSON.stringify({
+      event: 'api_startup',
+      status: 'ok',
+      nodeEnv,
+      port,
+      apiPrefix,
+    }),
   );
   if (nodeEnv !== 'production') {
-    Logger.log(
+    bootstrapLogger.log(
       `Swagger docs are available at: http://localhost:${port}/${apiPrefix}/docs`,
     );
   }
 }
 
 bootstrap().catch((error: unknown) => {
-  Logger.error(
-    'Failed to start application.',
+  bootstrapLogger.error(
+    JSON.stringify({
+      event: 'api_startup',
+      status: 'failed',
+      errorName: error instanceof Error ? error.name : 'UnknownError',
+      message: error instanceof Error ? error.message : String(error),
+    }),
     error instanceof Error ? error.stack : String(error),
   );
   process.exit(1);

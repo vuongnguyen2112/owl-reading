@@ -216,6 +216,14 @@ Production API start command:
 pnpm start:api:prod
 ```
 
+Production observability is intentionally lightweight:
+
+- API startup success and failure are logged as structured JSON events.
+- Each HTTP request logs method, path, status code, duration, request id, user agent, and remote address.
+- API responses include an `x-request-id` header.
+- Unhandled exceptions are logged as structured JSON events through a global exception filter.
+- Unexpected server errors return a generic `Internal server error` message to clients while preserving details in server logs.
+
 ## Production And Railway Notes
 
 Recommended Railway services:
@@ -262,10 +270,7 @@ Smoke checks after deployment:
 - No platform-specific Railway config yet.
 - No Cloudflare R2 integration or real cover image upload yet.
 - No EPUB import, scraping, or external content APIs.
-- No CSRF protection for the refresh-cookie flow.
 - Access tokens are stored in `sessionStorage`, which remains XSS-sensitive.
 - No password reset, email verification, or MFA.
-- No structured request logging.
-- No global exception filter.
 - Rate limiting is in-memory only, not distributed.
 - Bookmark/progress failure UX is still minimal.
