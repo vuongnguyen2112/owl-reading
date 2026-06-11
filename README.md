@@ -157,11 +157,23 @@ pnpm db:migrate:deploy
 pnpm start:api:prod
 ```
 
-Current reader and admin production builds use same-origin `/api` as the API
-base URL. The first staging deployment should either serve the API on the same
-origin under `/api` or add platform-specific proxy/rewrites after choosing a
-host. No Vercel, Netlify, Render, Railway, or Docker deployment config is
-included yet.
+Current reader and admin production builds use a direct staging API URL:
+`https://api-staging.up.railway.app/api`. Replace this placeholder in
+`apps/owl-reading/src/environments/environment.production.ts` and
+`admin-dashboard/src/environments/environment.production.ts` with the real
+Railway API service URL before building the staging frontends.
+
+For cross-site Railway staging, configure the API with:
+
+```env
+CORS_ORIGINS="https://reader-staging.up.railway.app,https://admin-staging.up.railway.app"
+AUTH_COOKIE_SECURE=true
+AUTH_COOKIE_SAMESITE="none"
+```
+
+Replace the reader/admin URLs with the real Railway frontend service URLs. No
+runtime config, Railway proxy/rewrites, or Docker deployment config is included
+yet.
 
 After deployment, verify:
 
@@ -169,7 +181,7 @@ After deployment, verify:
 - `GET /api/health/ready` returns `200`.
 - `GET /api/health/ready` returns `503` if PostgreSQL is unavailable.
 - Swagger docs are not exposed at `/api/docs` when `NODE_ENV=production`.
-- Reader and admin production builds call the configured `/api` endpoint.
+- Reader and admin production builds call the configured staging API endpoint.
 
 ## Database
 
