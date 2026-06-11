@@ -376,3 +376,7 @@ Smoke checks after deployment:
 - No password reset, email verification, or MFA.
 - Rate limiting is in-memory only, not distributed.
 - Bookmark/progress failure UX is still minimal.
+
+## Status
+
+✅ Production deployment completed on Railway.
