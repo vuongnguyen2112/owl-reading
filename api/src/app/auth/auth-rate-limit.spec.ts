@@ -70,7 +70,7 @@ async function createTestApp(): Promise<INestApplication> {
 async function postJson(url: string, path: string, body: object): Promise<Response> {
   return fetch(`${url}${path}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', Origin: allowedOrigin },
     body: JSON.stringify(body),
   });
 }
@@ -152,6 +152,96 @@ describe('AuthController cookie-backed auth source validation', () => {
 
   afterEach(async () => {
     await app?.close();
+  });
+
+  it('rejects login requests without an Origin or Referer', async () => {
+    const response = await fetch(`${url}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: 'reader@example.com',
+        password: 'password123',
+      }),
+    });
+
+    expect(response.status).toBe(403);
+  });
+
+  it('rejects login requests from an untrusted Origin', async () => {
+    const response = await fetch(`${url}/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Origin: 'https://evil.example',
+      },
+      body: JSON.stringify({
+        email: 'reader@example.com',
+        password: 'password123',
+      }),
+    });
+
+    expect(response.status).toBe(403);
+  });
+
+  it('allows login requests from an allowed Origin', async () => {
+    const response = await fetch(`${url}/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Origin: allowedOrigin,
+      },
+      body: JSON.stringify({
+        email: 'reader@example.com',
+        password: 'password123',
+      }),
+    });
+
+    expect(response.status).toBe(201);
+  });
+
+  it('rejects register requests without an Origin or Referer', async () => {
+    const response = await fetch(`${url}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: 'reader@example.com',
+        password: 'password123',
+      }),
+    });
+
+    expect(response.status).toBe(403);
+  });
+
+  it('rejects register requests from an untrusted Origin', async () => {
+    const response = await fetch(`${url}/auth/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Origin: 'https://evil.example',
+      },
+      body: JSON.stringify({
+        email: 'reader@example.com',
+        password: 'password123',
+      }),
+    });
+
+    expect(response.status).toBe(403);
+  });
+
+  it('allows register requests from an allowed Referer origin', async () => {
+    const response = await fetch(`${url}/auth/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Referer: `${allowedOrigin}/register`,
+      },
+      body: JSON.stringify({
+        email: 'reader@example.com',
+        password: 'password123',
+      }),
+    });
+
+    expect(response.status).toBe(201);
   });
 
   it('rejects refresh requests without an Origin or Referer', async () => {

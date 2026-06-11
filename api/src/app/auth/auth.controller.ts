@@ -49,9 +49,11 @@ export class AuthController {
   @SkipThrottle({ login: true, refresh: true })
   @ApiOkResponse({ type: AuthResponseDto })
   async register(
+    @Req() request: CookieRequest,
     @Body() dto: RegisterDto,
     @Res({ passthrough: true }) response: CookieResponse,
   ): Promise<AuthResponseDto> {
+    this.assertAllowedCookieBackedAuthSource(request);
     const result = await this.authService.register(dto);
     this.setRefreshCookie(response, result.refreshToken);
 
@@ -66,9 +68,11 @@ export class AuthController {
   @SkipThrottle({ register: true, refresh: true })
   @ApiOkResponse({ type: AuthResponseDto })
   async login(
+    @Req() request: CookieRequest,
     @Body() dto: LoginDto,
     @Res({ passthrough: true }) response: CookieResponse,
   ): Promise<AuthResponseDto> {
+    this.assertAllowedCookieBackedAuthSource(request);
     const result = await this.authService.login(dto);
     this.setRefreshCookie(response, result.refreshToken);
 
