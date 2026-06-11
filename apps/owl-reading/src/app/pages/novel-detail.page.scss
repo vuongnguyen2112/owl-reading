@@ -37,9 +37,8 @@
   color: var(--app-muted);
 }
 
-.disabled-link {
-  pointer-events: none;
-  opacity: 0.55;
+.no-chapters-callout {
+  font-weight: 600;
 }
 
 .state-panel {

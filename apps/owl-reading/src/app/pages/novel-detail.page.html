@@ -15,6 +15,7 @@
     <p class="eyebrow">Published novel</p>
     <h1>{{ novel()?.title }}</h1>
     <p>{{ novel()?.description || 'No description available.' }}</p>
+    @if (chapters().length) {
     <a
       mat-flat-button
       color="primary"
@@ -24,9 +25,11 @@
           'chapters',
           startChapterNumber()
         ]"
-      [class.disabled-link]="!chapters().length"
       >{{ startReadingLabel() }}</a
     >
+    } @else {
+    <p class="empty-copy no-chapters-callout">No chapters available yet.</p>
+    }
     @if (canBookmark()) {
     <button mat-stroked-button type="button" (click)="toggleNovelBookmark()">
       {{ novelBookmark() ? 'Remove bookmark' : 'Bookmark novel' }}

@@ -84,6 +84,12 @@ export class NovelsService {
   }
 
   async create(dto: CreateNovelDto) {
+    if (dto.status === NovelStatus.PUBLISHED) {
+      throw new ConflictException(
+        'Novel must have at least one chapter before publishing.',
+      );
+    }
+
     try {
       const novel = await this.prisma.novel.create({
         data: {
@@ -103,6 +109,10 @@ export class NovelsService {
   }
 
   async update(id: string, dto: UpdateNovelDto) {
+    if (dto.status === NovelStatus.PUBLISHED) {
+      await this.assertHasChaptersBeforePublishing(id);
+    }
+
     try {
       const novel = await this.prisma.novel.update({
         where: { id },
@@ -169,6 +179,27 @@ export class NovelsService {
     }
 
     return slug;
+  }
+
+  private async assertHasChaptersBeforePublishing(id: string): Promise<void> {
+    const novel = await this.prisma.novel.findUnique({
+      where: { id },
+      select: {
+        _count: {
+          select: { chapters: true },
+        },
+      },
+    });
+
+    if (!novel) {
+      throw new NotFoundException('Novel was not found.');
+    }
+
+    if (novel._count.chapters === 0) {
+      throw new ConflictException(
+        'Novel must have at least one chapter before publishing.',
+      );
+    }
   }
 
   private handleKnownError(error: unknown): void {

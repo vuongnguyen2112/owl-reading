@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  ForbiddenException,
   Get,
   Post,
   Req,
@@ -8,6 +9,7 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { SkipThrottle, ThrottlerGuard } from '@nestjs/throttler';
 import { CurrentUser } from './decorators/current-user.decorator';
@@ -23,6 +25,9 @@ const refreshCookieName = 'owl_refresh_token';
 interface CookieRequest {
   headers: {
     cookie?: string;
+    origin?: string;
+    referer?: string;
+    referrer?: string;
   };
 }
 
@@ -34,7 +39,10 @@ interface CookieResponse {
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Post('register')
   @UseGuards(ThrottlerGuard)
@@ -78,6 +86,7 @@ export class AuthController {
     @Req() request: CookieRequest,
     @Res({ passthrough: true }) response: CookieResponse,
   ): Promise<AuthResponseDto> {
+    this.assertAllowedCookieBackedAuthSource(request);
     const result = await this.authService.refresh(
       this.getRefreshCookie(request),
     );
@@ -94,6 +103,7 @@ export class AuthController {
     @Req() request: CookieRequest,
     @Res({ passthrough: true }) response: CookieResponse,
   ): Promise<{ success: true }> {
+    this.assertAllowedCookieBackedAuthSource(request);
     await this.authService.logout(this.getOptionalRefreshCookie(request));
     response.clearCookie(refreshCookieName, {
       path: '/api/auth',
@@ -133,5 +143,47 @@ export class AuthController {
       .map((cookie) => cookie.trim())
       .find((cookie) => cookie.startsWith(`${refreshCookieName}=`))
       ?.slice(refreshCookieName.length + 1);
+  }
+
+  private assertAllowedCookieBackedAuthSource(request: CookieRequest): void {
+    const sourceOrigin = this.getRequestSourceOrigin(request);
+
+    if (!sourceOrigin || !this.getAllowedOrigins().has(sourceOrigin)) {
+      throw new ForbiddenException('Request origin is not allowed.');
+    }
+  }
+
+  private getRequestSourceOrigin(request: CookieRequest): string | null {
+    const origin = request.headers.origin;
+
+    if (origin) {
+      return this.toOrigin(origin);
+    }
+
+    const referer = request.headers.referer ?? request.headers.referrer;
+
+    if (referer) {
+      return this.toOrigin(referer);
+    }
+
+    return null;
+  }
+
+  private getAllowedOrigins(): Set<string> {
+    return new Set(
+      this.configService
+        .getOrThrow<string>('CORS_ORIGINS')
+        .split(',')
+        .map((origin) => this.toOrigin(origin.trim()))
+        .filter((origin): origin is string => Boolean(origin)),
+    );
+  }
+
+  private toOrigin(value: string): string | null {
+    try {
+      return new URL(value).origin;
+    } catch {
+      return null;
+    }
   }
 }

@@ -5,24 +5,32 @@ import { NovelsService } from './novels.service';
 
 describe('NovelsService', () => {
   let prisma: {
+    chapter: {
+      count: jest.Mock;
+    };
     novel: {
       count: jest.Mock;
       create: jest.Mock;
       delete: jest.Mock;
       findUnique: jest.Mock;
       findMany: jest.Mock;
+      update: jest.Mock;
     };
   };
   let service: NovelsService;
 
   beforeEach(() => {
     prisma = {
+      chapter: {
+        count: jest.fn(),
+      },
       novel: {
         count: jest.fn(),
         create: jest.fn(),
         delete: jest.fn(),
         findUnique: jest.fn(),
         findMany: jest.fn(),
+        update: jest.fn(),
       },
     };
     service = new NovelsService(prisma as unknown as PrismaService);
@@ -85,6 +93,69 @@ describe('NovelsService', () => {
           contains: 'owl',
           mode: 'insensitive',
         },
+      },
+    });
+  });
+
+  it('blocks creating novels as published because they have no chapters yet', async () => {
+    await expect(
+      service.create({
+        title: 'The Clockwork Owl',
+        status: NovelStatus.PUBLISHED,
+      }),
+    ).rejects.toBeInstanceOf(ConflictException);
+
+    expect(prisma.novel.create).not.toHaveBeenCalled();
+  });
+
+  it('blocks publishing existing novels with no chapters', async () => {
+    prisma.novel.findUnique.mockResolvedValue({
+      _count: { chapters: 0 },
+    });
+
+    await expect(
+      service.update('novel-id', { status: NovelStatus.PUBLISHED }),
+    ).rejects.toBeInstanceOf(ConflictException);
+
+    expect(prisma.novel.findUnique).toHaveBeenCalledWith({
+      where: { id: 'novel-id' },
+      select: {
+        _count: {
+          select: { chapters: true },
+        },
+      },
+    });
+    expect(prisma.novel.update).not.toHaveBeenCalled();
+  });
+
+  it('allows publishing existing novels with chapters', async () => {
+    const updatedNovel = {
+      id: 'novel-id',
+      title: 'The Clockwork Owl',
+      slug: 'the-clockwork-owl',
+      description: null,
+      coverImageUrl: null,
+      status: NovelStatus.PUBLISHED,
+      createdAt: new Date('2026-01-01T00:00:00.000Z'),
+      updatedAt: new Date('2026-01-02T00:00:00.000Z'),
+    };
+
+    prisma.novel.findUnique.mockResolvedValue({
+      _count: { chapters: 1 },
+    });
+    prisma.novel.update.mockResolvedValue(updatedNovel);
+
+    await expect(
+      service.update('novel-id', { status: NovelStatus.PUBLISHED }),
+    ).resolves.toEqual(updatedNovel);
+    expect(prisma.novel.update).toHaveBeenCalledWith({
+      where: { id: 'novel-id' },
+      data: {
+        title: undefined,
+        slug: undefined,
+        description: undefined,
+        coverImageUrl: undefined,
+        status: NovelStatus.PUBLISHED,
       },
     });
   });
