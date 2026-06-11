@@ -1,3 +1,3 @@
 export const environment = {
-  apiBaseUrl: 'https://api-staging.up.railway.app/api',
+  apiBaseUrl: 'https://api-production-48fa.up.railway.app/api',
 };
