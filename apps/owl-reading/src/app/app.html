@@ -9,7 +9,13 @@
     >Home</a
   >
   <a mat-button routerLink="/novels" routerLinkActive="active-link">Novels</a>
+  @if (isAuthenticated()) {
   <a mat-button routerLink="/account" routerLinkActive="active-link">Account</a>
+  <button mat-button type="button" (click)="logout()">Logout</button>
+  } @else {
+  <a mat-button routerLink="/login" routerLinkActive="active-link">Login</a>
+  <a mat-flat-button color="primary" routerLink="/register">Register</a>
+  }
 </mat-toolbar>
 
 <main class="app-shell">

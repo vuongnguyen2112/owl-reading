@@ -1,0 +1,23 @@
+.auth-shell {
+  display: grid;
+  min-height: calc(100vh - 160px);
+  place-items: center;
+}
+
+.auth-card {
+  width: min(100%, 440px);
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  box-shadow: none;
+}
+
+.auth-form {
+  display: grid;
+  gap: 12px;
+  padding-top: 16px;
+}
+
+.error-copy {
+  margin: 0;
+  color: #b3261e;
+}

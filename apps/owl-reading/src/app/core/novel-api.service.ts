@@ -15,12 +15,13 @@ import {
   UserProfile,
 } from './novel-api.models';
 import { environment } from '../../environments/environment';
+import { ReaderAuthService } from './reader-auth.service';
 
 const API_BASE_URL = environment.apiBaseUrl.replace(/\/$/, '');
-const ACCESS_TOKEN_STORAGE_KEY = 'owl_access_token';
 
 @Injectable({ providedIn: 'root' })
 export class NovelApiService {
+  private readonly auth = inject(ReaderAuthService);
   private readonly http = inject(HttpClient);
 
   listNovels(params: ListNovelsParams = {}) {
@@ -137,7 +138,7 @@ export class NovelApiService {
   }
 
   isAuthenticated() {
-    return Boolean(this.getAuthHeaders());
+    return this.auth.isAuthenticated();
   }
 
   private toHttpParams(params: ListNovelsParams | ListChaptersParams) {
@@ -153,7 +154,7 @@ export class NovelApiService {
   }
 
   private getAuthHeaders() {
-    const token = globalThis.sessionStorage?.getItem(ACCESS_TOKEN_STORAGE_KEY);
+    const token = this.auth.getAccessToken();
 
     return token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : null;
   }

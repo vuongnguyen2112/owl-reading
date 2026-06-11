@@ -15,12 +15,13 @@ import {
   SaveNovelRequest,
 } from './admin-api.models';
 import { environment } from '../../environments/environment';
+import { AdminAuthService } from './admin-auth.service';
 
 const API_BASE_URL = environment.apiBaseUrl.replace(/\/$/, '');
-const ACCESS_TOKEN_STORAGE_KEY = 'owl_access_token';
 
 @Injectable({ providedIn: 'root' })
 export class AdminApiService {
+  private readonly auth = inject(AdminAuthService);
   private readonly http = inject(HttpClient);
 
   listNovels(params: ListNovelsParams = {}) {
@@ -100,7 +101,7 @@ export class AdminApiService {
   }
 
   isAuthenticated() {
-    return Boolean(this.getAccessToken());
+    return this.auth.isAuthenticated();
   }
 
   getErrorMessage(error: unknown) {
@@ -127,15 +128,11 @@ export class AdminApiService {
   }
 
   private getAuthHeaders() {
-    const token = this.getAccessToken();
+    const token = this.auth.getAccessToken();
 
     return token
       ? new HttpHeaders({ Authorization: `Bearer ${token}` })
       : new HttpHeaders();
-  }
-
-  private getAccessToken() {
-    return globalThis.sessionStorage?.getItem(ACCESS_TOKEN_STORAGE_KEY) ?? '';
   }
 
   private getServerMessage(error: HttpErrorResponse) {
