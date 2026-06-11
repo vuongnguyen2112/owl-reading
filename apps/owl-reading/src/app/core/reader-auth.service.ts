@@ -1,10 +1,10 @@
 import { HttpClient, HttpContext, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
+import { getRuntimeApiBaseUrl } from '@owl-reading/shared-utils';
 import { finalize, map, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { SKIP_AUTH_REFRESH } from './auth-http-context';
 
-const API_BASE_URL = environment.apiBaseUrl.replace(/\/$/, '');
 const ACCESS_TOKEN_STORAGE_KEY = 'owl_access_token';
 
 export interface AuthUser {
@@ -31,6 +31,7 @@ export interface RegisterRequest extends LoginRequest {
 @Injectable({ providedIn: 'root' })
 export class ReaderAuthService {
   private readonly http = inject(HttpClient);
+  private readonly apiBaseUrl = getRuntimeApiBaseUrl(environment.apiBaseUrl);
   private readonly accessToken = signal(this.readAccessToken());
   private readonly user = signal<AuthUser | null>(null);
 
@@ -39,7 +40,7 @@ export class ReaderAuthService {
 
   login(request: LoginRequest) {
     return this.http
-      .post<AuthResponse>(`${API_BASE_URL}/auth/login`, request, {
+      .post<AuthResponse>(`${this.apiBaseUrl}/auth/login`, request, {
         context: this.skipRefreshContext(),
         withCredentials: true,
       })
@@ -48,7 +49,7 @@ export class ReaderAuthService {
 
   register(request: RegisterRequest) {
     return this.http
-      .post<AuthResponse>(`${API_BASE_URL}/auth/register`, request, {
+      .post<AuthResponse>(`${this.apiBaseUrl}/auth/register`, request, {
         context: this.skipRefreshContext(),
         withCredentials: true,
       })
@@ -61,7 +62,7 @@ export class ReaderAuthService {
     }
 
     this.http
-      .get<AuthUser>(`${API_BASE_URL}/auth/me`, {
+      .get<AuthUser>(`${this.apiBaseUrl}/auth/me`, {
         headers: { Authorization: `Bearer ${this.accessToken()}` },
       })
       .subscribe({
@@ -73,7 +74,7 @@ export class ReaderAuthService {
   refreshAccessToken() {
     return this.http
       .post<AuthResponse>(
-        `${API_BASE_URL}/auth/refresh`,
+        `${this.apiBaseUrl}/auth/refresh`,
         {},
         {
           context: this.skipRefreshContext(),
@@ -92,7 +93,7 @@ export class ReaderAuthService {
   logout() {
     return this.http
       .post<{ success: true }>(
-        `${API_BASE_URL}/auth/logout`,
+        `${this.apiBaseUrl}/auth/logout`,
         {},
         {
           context: this.skipRefreshContext(),

@@ -1,6 +1,7 @@
 import { EMPTY, of } from 'rxjs';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
+import { getRuntimeApiBaseUrl } from '@owl-reading/shared-utils';
 import {
   Bookmark,
   Chapter,
@@ -17,35 +18,34 @@ import {
 import { environment } from '../../environments/environment';
 import { ReaderAuthService } from './reader-auth.service';
 
-const API_BASE_URL = environment.apiBaseUrl.replace(/\/$/, '');
-
 @Injectable({ providedIn: 'root' })
 export class NovelApiService {
   private readonly auth = inject(ReaderAuthService);
   private readonly http = inject(HttpClient);
+  private readonly apiBaseUrl = getRuntimeApiBaseUrl(environment.apiBaseUrl);
 
   listNovels(params: ListNovelsParams = {}) {
-    return this.http.get<PaginatedResponse<Novel>>(`${API_BASE_URL}/novels`, {
+    return this.http.get<PaginatedResponse<Novel>>(`${this.apiBaseUrl}/novels`, {
       params: this.toHttpParams(params),
     });
   }
 
   getNovel(slug: string) {
     return this.http.get<Novel>(
-      `${API_BASE_URL}/novels/${encodeURIComponent(slug)}`,
+      `${this.apiBaseUrl}/novels/${encodeURIComponent(slug)}`,
     );
   }
 
   listChapters(slug: string, params: ListChaptersParams = {}) {
     return this.http.get<PaginatedResponse<Chapter>>(
-      `${API_BASE_URL}/novels/${encodeURIComponent(slug)}/chapters`,
+      `${this.apiBaseUrl}/novels/${encodeURIComponent(slug)}/chapters`,
       { params: this.toHttpParams(params) },
     );
   }
 
   getChapter(slug: string, chapterNumber: number) {
     return this.http.get<Chapter>(
-      `${API_BASE_URL}/novels/${encodeURIComponent(slug)}/chapters/${chapterNumber}`,
+      `${this.apiBaseUrl}/novels/${encodeURIComponent(slug)}/chapters/${chapterNumber}`,
     );
   }
 
@@ -57,7 +57,7 @@ export class NovelApiService {
     }
 
     return this.http.get<ReadingProgress | null>(
-      `${API_BASE_URL}/reading-progress/novels/${encodeURIComponent(novelId)}`,
+      `${this.apiBaseUrl}/reading-progress/novels/${encodeURIComponent(novelId)}`,
       { headers },
     );
   }
@@ -70,7 +70,7 @@ export class NovelApiService {
     }
 
     return this.http.put<ReadingProgress>(
-      `${API_BASE_URL}/reading-progress`,
+      `${this.apiBaseUrl}/reading-progress`,
       request,
       { headers },
     );
@@ -83,7 +83,7 @@ export class NovelApiService {
       return of<Bookmark[]>([]);
     }
 
-    return this.http.get<Bookmark[]>(`${API_BASE_URL}/bookmarks`, {
+    return this.http.get<Bookmark[]>(`${this.apiBaseUrl}/bookmarks`, {
       headers,
     });
   }
@@ -95,7 +95,7 @@ export class NovelApiService {
       return EMPTY;
     }
 
-    return this.http.post<Bookmark>(`${API_BASE_URL}/bookmarks`, request, {
+    return this.http.post<Bookmark>(`${this.apiBaseUrl}/bookmarks`, request, {
       headers,
     });
   }
@@ -108,7 +108,7 @@ export class NovelApiService {
     }
 
     return this.http.delete<{ success: true }>(
-      `${API_BASE_URL}/bookmarks/${encodeURIComponent(id)}`,
+      `${this.apiBaseUrl}/bookmarks/${encodeURIComponent(id)}`,
       { headers },
     );
   }
@@ -120,7 +120,7 @@ export class NovelApiService {
       return of<UserProfile | null>(null);
     }
 
-    return this.http.get<UserProfile>(`${API_BASE_URL}/users/me`, {
+    return this.http.get<UserProfile>(`${this.apiBaseUrl}/users/me`, {
       headers,
     });
   }
@@ -132,7 +132,7 @@ export class NovelApiService {
       return EMPTY;
     }
 
-    return this.http.put<UserProfile>(`${API_BASE_URL}/users/me`, request, {
+    return this.http.put<UserProfile>(`${this.apiBaseUrl}/users/me`, request, {
       headers,
     });
   }

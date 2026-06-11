@@ -105,12 +105,17 @@ Optional backend settings:
 - `AUTH_REFRESH_RATE_LIMIT_TTL_SECONDS`: defaults to `60`.
 - `AUTH_REFRESH_RATE_LIMIT_MAX`: defaults to `30`.
 
-Local frontend builds use `http://localhost:3000/api`. Production frontend builds currently use the API URL configured in:
+Local frontend builds use `http://localhost:3000/api` as a fallback when no runtime config file is present.
 
-- `apps/owl-reading/src/environments/environment.production.ts`
-- `admin-dashboard/src/environments/environment.production.ts`
+Production frontend builds load API configuration from `/runtime-config.json` before Angular bootstraps:
 
-There is no runtime frontend config yet, so changing the production API URL requires rebuilding the frontends.
+```json
+{
+  "apiBaseUrl": "https://api.example.com/api"
+}
+```
+
+The URL must be an absolute HTTP(S) URL. Production environment files intentionally do not contain an API URL, so a missing or invalid runtime config fails startup instead of silently calling the wrong backend. This allows the same built frontend assets to be promoted between staging and production by replacing only `runtime-config.json`.
 
 ## Database And Migrations
 
@@ -226,8 +231,9 @@ Typical deployment order:
 2. Deploy the API with production environment variables.
 3. Run `pnpm db:migrate:deploy`.
 4. Promote the first admin intentionally.
-5. Build and deploy reader/admin with the real API URL.
-6. Smoke test health, auth, admin, and reader workflows.
+5. Build and deploy reader/admin static assets.
+6. Provide `/runtime-config.json` for each frontend with the real API URL.
+7. Smoke test health, auth, admin, and reader workflows.
 
 For cross-site Railway staging, configure the API with the real frontend origins:
 
@@ -247,13 +253,13 @@ Smoke checks after deployment:
 - `GET /api/health/ready` returns `200` when PostgreSQL is reachable.
 - `GET /api/health/ready` returns `503` when PostgreSQL is unavailable.
 - `/api/docs` is not exposed when `NODE_ENV=production`.
-- Reader and admin production builds call the intended API URL.
+- Reader and admin `/runtime-config.json` files contain the intended API URL.
+- Reader and admin production apps fail to start if `/runtime-config.json` is missing or invalid.
 
 ## Known Remaining Gaps
 
 - No Dockerfiles yet.
 - No platform-specific Railway config yet.
-- No runtime frontend config; API URL changes require frontend rebuilds.
 - No Cloudflare R2 integration or real cover image upload yet.
 - No EPUB import, scraping, or external content APIs.
 - No CSRF protection for the refresh-cookie flow.

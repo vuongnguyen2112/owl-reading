@@ -1,10 +1,10 @@
 import { HttpClient, HttpContext, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
+import { getRuntimeApiBaseUrl } from '@owl-reading/shared-utils';
 import { finalize, map, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { SKIP_AUTH_REFRESH } from './auth-http-context';
 
-const API_BASE_URL = environment.apiBaseUrl.replace(/\/$/, '');
 const ACCESS_TOKEN_STORAGE_KEY = 'owl_access_token';
 
 export interface AdminAuthUser {
@@ -27,6 +27,7 @@ export interface AdminLoginRequest {
 @Injectable({ providedIn: 'root' })
 export class AdminAuthService {
   private readonly http = inject(HttpClient);
+  private readonly apiBaseUrl = getRuntimeApiBaseUrl(environment.apiBaseUrl);
   private readonly accessToken = signal(this.readAccessToken());
   private readonly user = signal<AdminAuthUser | null>(null);
 
@@ -35,7 +36,7 @@ export class AdminAuthService {
 
   login(request: AdminLoginRequest) {
     return this.http
-      .post<AdminAuthResponse>(`${API_BASE_URL}/auth/login`, request, {
+      .post<AdminAuthResponse>(`${this.apiBaseUrl}/auth/login`, request, {
         context: this.skipRefreshContext(),
         withCredentials: true,
       })
@@ -48,7 +49,7 @@ export class AdminAuthService {
     }
 
     this.http
-      .get<AdminAuthUser>(`${API_BASE_URL}/auth/me`, {
+      .get<AdminAuthUser>(`${this.apiBaseUrl}/auth/me`, {
         headers: { Authorization: `Bearer ${this.accessToken()}` },
       })
       .subscribe({
@@ -67,7 +68,7 @@ export class AdminAuthService {
   refreshAccessToken() {
     return this.http
       .post<AdminAuthResponse>(
-        `${API_BASE_URL}/auth/refresh`,
+        `${this.apiBaseUrl}/auth/refresh`,
         {},
         {
           context: this.skipRefreshContext(),
@@ -86,7 +87,7 @@ export class AdminAuthService {
   logout() {
     return this.http
       .post<{ success: true }>(
-        `${API_BASE_URL}/auth/logout`,
+        `${this.apiBaseUrl}/auth/logout`,
         {},
         {
           context: this.skipRefreshContext(),

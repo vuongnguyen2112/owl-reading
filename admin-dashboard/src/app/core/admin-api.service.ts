@@ -5,6 +5,7 @@ import {
   HttpParams,
 } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
+import { getRuntimeApiBaseUrl } from '@owl-reading/shared-utils';
 import {
   Chapter,
   ListChaptersParams,
@@ -17,16 +18,15 @@ import {
 import { environment } from '../../environments/environment';
 import { AdminAuthService } from './admin-auth.service';
 
-const API_BASE_URL = environment.apiBaseUrl.replace(/\/$/, '');
-
 @Injectable({ providedIn: 'root' })
 export class AdminApiService {
   private readonly auth = inject(AdminAuthService);
   private readonly http = inject(HttpClient);
+  private readonly apiBaseUrl = getRuntimeApiBaseUrl(environment.apiBaseUrl);
 
   listNovels(params: ListNovelsParams = {}) {
     return this.http.get<PaginatedResponse<Novel>>(
-      `${API_BASE_URL}/admin/novels`,
+      `${this.apiBaseUrl}/admin/novels`,
       {
         headers: this.getAuthHeaders(),
         params: this.toHttpParams(params),
@@ -36,20 +36,20 @@ export class AdminApiService {
 
   getNovel(id: string) {
     return this.http.get<Novel>(
-      `${API_BASE_URL}/admin/novels/${encodeURIComponent(id)}`,
+      `${this.apiBaseUrl}/admin/novels/${encodeURIComponent(id)}`,
       { headers: this.getAuthHeaders() },
     );
   }
 
   createNovel(request: SaveNovelRequest) {
-    return this.http.post<Novel>(`${API_BASE_URL}/admin/novels`, request, {
+    return this.http.post<Novel>(`${this.apiBaseUrl}/admin/novels`, request, {
       headers: this.getAuthHeaders(),
     });
   }
 
   updateNovel(id: string, request: SaveNovelRequest) {
     return this.http.patch<Novel>(
-      `${API_BASE_URL}/admin/novels/${encodeURIComponent(id)}`,
+      `${this.apiBaseUrl}/admin/novels/${encodeURIComponent(id)}`,
       request,
       { headers: this.getAuthHeaders() },
     );
@@ -57,14 +57,14 @@ export class AdminApiService {
 
   deleteNovel(id: string) {
     return this.http.delete<Novel>(
-      `${API_BASE_URL}/admin/novels/${encodeURIComponent(id)}`,
+      `${this.apiBaseUrl}/admin/novels/${encodeURIComponent(id)}`,
       { headers: this.getAuthHeaders() },
     );
   }
 
   listChapters(params: ListChaptersParams = {}) {
     return this.http.get<PaginatedResponse<Chapter>>(
-      `${API_BASE_URL}/admin/chapters`,
+      `${this.apiBaseUrl}/admin/chapters`,
       {
         headers: this.getAuthHeaders(),
         params: this.toHttpParams(params),
@@ -74,20 +74,20 @@ export class AdminApiService {
 
   getChapter(id: string) {
     return this.http.get<Chapter>(
-      `${API_BASE_URL}/admin/chapters/${encodeURIComponent(id)}`,
+      `${this.apiBaseUrl}/admin/chapters/${encodeURIComponent(id)}`,
       { headers: this.getAuthHeaders() },
     );
   }
 
   createChapter(request: SaveChapterRequest) {
-    return this.http.post<Chapter>(`${API_BASE_URL}/admin/chapters`, request, {
+    return this.http.post<Chapter>(`${this.apiBaseUrl}/admin/chapters`, request, {
       headers: this.getAuthHeaders(),
     });
   }
 
   updateChapter(id: string, request: SaveChapterRequest) {
     return this.http.patch<Chapter>(
-      `${API_BASE_URL}/admin/chapters/${encodeURIComponent(id)}`,
+      `${this.apiBaseUrl}/admin/chapters/${encodeURIComponent(id)}`,
       request,
       { headers: this.getAuthHeaders() },
     );
@@ -95,7 +95,7 @@ export class AdminApiService {
 
   deleteChapter(id: string) {
     return this.http.delete<Chapter>(
-      `${API_BASE_URL}/admin/chapters/${encodeURIComponent(id)}`,
+      `${this.apiBaseUrl}/admin/chapters/${encodeURIComponent(id)}`,
       { headers: this.getAuthHeaders() },
     );
   }

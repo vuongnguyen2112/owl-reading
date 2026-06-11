@@ -91,6 +91,7 @@ Implemented:
 - Swagger gated so docs are not exposed in production.
 - Production-safe Prisma deploy script: `pnpm db:migrate:deploy`.
 - Production API start command: `pnpm start:api:prod`.
+- Runtime frontend API config via `/runtime-config.json`.
 - Seed script refuses production and non-local DB unless explicitly allowed.
 - Admin promotion script refuses production unless explicitly allowed.
 - Health/readiness endpoints are available for deploy smoke checks.
@@ -100,7 +101,6 @@ Not implemented yet:
 
 - Dockerfiles.
 - Platform-specific deployment config.
-- Runtime frontend config.
 - Structured request logging.
 - Global exception filter.
 - Redis/distributed throttling.
@@ -110,11 +110,15 @@ Not implemented yet:
 
 Current staging approach:
 
-- Reader/admin production builds use a direct Railway API URL.
-- Placeholder currently documented/configured as `https://api-staging.up.railway.app/api`.
-- Before a real Railway staging build, replace this placeholder in:
-  - `apps/owl-reading/src/environments/environment.production.ts`
-  - `admin-dashboard/src/environments/environment.production.ts`
+- Reader/admin production builds load `/runtime-config.json` before Angular bootstraps.
+- Production environment files intentionally do not contain a hard-coded API URL.
+- Each deployed frontend must serve a `runtime-config.json` file like:
+
+```json
+{
+  "apiBaseUrl": "https://api-url/api"
+}
+```
 
 Recommended Railway services:
 
@@ -141,8 +145,9 @@ Deployment order:
 2. Deploy API with environment variables.
 3. Run `pnpm db:migrate:deploy`.
 4. Promote the first admin intentionally.
-5. Build/deploy reader and admin with the real API URL.
-6. Smoke test health, auth, admin, and reader visibility.
+5. Build/deploy reader and admin static assets.
+6. Provide `runtime-config.json` for reader and admin with the real API URL.
+7. Smoke test health, auth, admin, and reader visibility.
 
 ## Auth Status
 
@@ -185,7 +190,6 @@ Admin frontend:
 High-value remaining risks:
 
 - `README.md` still opens by describing the project as Phase 1 scaffolding with business features intentionally not implemented. That is stale.
-- No runtime frontend config; staging/prod API URL requires rebuild.
 - No platform-specific Railway config yet.
 - No Dockerfiles yet.
 - No CSRF protection for refresh-cookie flow.
