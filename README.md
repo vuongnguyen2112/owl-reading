@@ -1,8 +1,110 @@
 # Owl Reading
 
-Owl Reading is a web-only novel reading platform built as an Nx monorepo. The current MVP includes a public reader app, an admin dashboard, and a NestJS API backed by Prisma and PostgreSQL.
+A full-stack web novel reading platform built with NestJS, Angular, Nx, Prisma, and PostgreSQL. The application provides a reader experience for browsing and reading web novels, along with an admin dashboard for managing novels and chapters.
 
-The first release is web only. The backend API and shared models are structured so a mobile app can be added later without changing the core API shape.
+![Angular](https://img.shields.io/badge/Angular-20-red)
+![NestJS](https://img.shields.io/badge/NestJS-11-e0234e)
+![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue)
+![Railway](https://img.shields.io/badge/Deploy-Railway-purple)
+
+## 🚀 Live Demo
+
+### Reader Application
+
+https://reader-production-f602c.up.railway.app
+
+### Admin Dashboard
+
+https://admin-production-be1a.up.railway.app
+
+### API
+
+https://api-production-48fa.up.railway.app/api
+
+## ✨ Features
+
+### Reader Features
+
+* Browse published novels
+* Read chapters with chapter navigation
+* User registration and authentication
+* User profile management
+* Bookmark novels and chapters
+* Continue reading experience
+
+### Admin Features
+
+* Secure admin authentication
+* Create, edit, publish, and archive novels
+* Manage chapters and chapter order
+* Role-based authorization
+* Content publishing workflow
+
+### Backend Features
+
+* JWT authentication and refresh tokens
+* Role-based access control
+* Prisma ORM with PostgreSQL
+* Request validation and error handling
+* Health and readiness endpoints
+* Rate limiting for authentication endpoints
+
+## 🛠 Tech Stack
+
+### Frontend
+
+* Angular
+* TypeScript
+* RxJS
+
+### Backend
+
+* NestJS
+* Prisma ORM
+* PostgreSQL
+* JWT Authentication
+
+### Infrastructure
+
+* Nx Monorepo
+* Railway
+* GitHub
+* PostgreSQL
+
+## 🏗 Architecture
+
+```text
+Reader App ──► NestJS API ──► PostgreSQL
+Admin App  ──► NestJS API ──► PostgreSQL
+```
+
+## 📦 Production Deployment
+
+The application is fully deployed on Railway:
+
+* ✅ Reader frontend deployed
+* ✅ Admin dashboard deployed
+* ✅ NestJS API deployed
+* ✅ PostgreSQL database deployed
+* ✅ Production environment configured
+* ✅ End-to-end functionality verified
+
+## 📸 Demo Workflow
+
+1. Register or log in as a reader
+2. Browse published novels
+3. Open a novel and start reading chapters
+4. Bookmark novels and chapters
+5. Log in to the admin dashboard
+6. Create and publish novels
+7. Manage chapters and content
+
+---
+
+## Development
+
+See the sections below for local development, environment setup, scripts, deployment, and architecture details.
 
 ## Requirements
 
